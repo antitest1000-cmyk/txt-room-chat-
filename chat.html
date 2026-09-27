@@ -960,7 +960,7 @@
         // ════════════════════════════════════════════════════
         //  CONFIG
         // ════════════════════════════════════════════════════
-        const SERVER_URL = 'http://localhost:3000';
+        const SERVER_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://YOUR_RENDER_URL.onrender.com';
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmrXdujt1sE-Eeyeuh7k-GuwUGWtxLcNS8GRTHbsB4-hs8YW5FeetrUrGLXEI539ly/exec';
         const CLOUDINARY_CLOUD = 'tgzv1edu';
         const CLOUDINARY_KEY = '796394868822991';

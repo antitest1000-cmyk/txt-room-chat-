@@ -260,7 +260,7 @@
             }
         }
 
-        const SERVER_URL = 'http://localhost:3000';
+        const SERVER_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://YOUR_RENDER_URL.onrender.com';
 
         function submitLogin(e, formType) {
             e.preventDefault();

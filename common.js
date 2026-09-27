@@ -60,7 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 4. Dynamic Website Images Manager
-    fetch('http://localhost:3000/api/images')
+    const SERVER_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://YOUR_RENDER_URL.onrender.com';
+    fetch(SERVER_URL + '/api/images')
         .then(res => res.json())
         .then(imageMap => {
             const images = document.querySelectorAll('img[data-image-key]');

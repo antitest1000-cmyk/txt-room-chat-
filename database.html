@@ -292,7 +292,8 @@
 <div id="toast-container"></div>
 
 <script>
-    const API_BASE = '/api/admin/db';
+    const SERVER_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://YOUR_RENDER_URL.onrender.com';
+    const API_BASE = `${SERVER_URL}/api/admin/db`;
     let currentTable = '';
     let currentColumns = [];
 
