@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Caught Me - Live Cam Chat Room. Interact via webcam with adults worldwide.">
+    <title>Caught Me | Live Cam Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="chat.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Open Sans', sans-serif; background: #111; color: #eee; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* ── Top Bar ── */
+        .cam-topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #1a1a1a; border-bottom: 2px solid #e8760a;
+            padding: 0 16px; height: 48px; flex-shrink: 0; z-index: 10;
+        }
+        .cam-topbar .logo { font-size: 18px; font-weight: 700; color: #e8760a; }
+        .cam-topbar .room-tag { font-size: 13px; color: #aaa; margin-left: 10px; }
+        .cam-topbar .right-bar { display: flex; align-items: center; gap: 12px; }
+        .cam-topbar .username-tag { font-size: 13px; color: #ccc; }
+        .btn-leave-cam { background: #333; color: #ccc; border: 1px solid #444; border-radius: 6px; padding: 5px 14px; cursor: pointer; font-size: 13px; text-decoration: none; }
+        .btn-leave-cam:hover { background: #c0392b; color: #fff; border-color: #c0392b; }
+
+        /* ── Main Layout ── */
+        .cam-layout {
+            display: flex; flex: 1; overflow: hidden;
+        }
+
+        /* ── Left: Cam Grid ── */
+        .cam-main {
+            flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #0d0d0d;
+        }
+        .cam-grid {
+            flex: 1; display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 4px; padding: 4px; overflow-y: auto; background: #111;
+        }
+        .cam-tile {
+            position: relative; background: #1a1a1a; border-radius: 8px;
+            overflow: hidden; aspect-ratio: 16/9;
+            border: 2px solid #2a2a2a; transition: border-color 0.2s;
+        }
+        .cam-tile.speaking { border-color: #4caf50; }
+        .cam-tile video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .cam-tile .tile-label {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 20px 10px 8px;
+            font-size: 13px; font-weight: 600; color: #fff;
+        }
+        .cam-tile .tile-label .cam-icons { float: right; display: flex; gap: 6px; }
+        .cam-tile .tile-label .cam-icons span { cursor: pointer; font-size: 14px; }
+        .cam-tile .no-cam {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #1a1a1a; color: #555;
+        }
+        .cam-tile .no-cam .avatar-big {
+            width: 70px; height: 70px; border-radius: 50%; margin-bottom: 8px;
+        }
+        .cam-tile .no-cam .no-cam-label { font-size: 13px; color: #888; }
+        /* My cam tile highlight */
+        .cam-tile.my-cam { border-color: #e8760a; }
+
+        /* ── My Controls Bar ── */
+        .cam-controls {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; background: #1a1a1a; padding: 10px 16px;
+            border-top: 1px solid #2a2a2a; flex-shrink: 0;
+        }
+        .ctrl-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            background: #2a2a2a; border: 1px solid #333; border-radius: 10px;
+            padding: 8px 18px; cursor: pointer; font-size: 20px; color: #fff;
+            transition: background 0.2s; position: relative;
+        }
+        .ctrl-btn label { font-size: 10px; color: #aaa; }
+        .ctrl-btn:hover { background: #333; }
+        .ctrl-btn.active { background: #e8760a; border-color: #e8760a; }
+        .ctrl-btn.danger  { background: #c0392b; border-color: #c0392b; }
+        .ctrl-btn.danger:hover { background: #a93226; }
+        /* Recording indicator */
+        .rec-dot { width: 10px; height: 10px; background: #e74c3c; border-radius: 50%; display: inline-block; margin-right: 4px; animation: blink 1s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        /* ── Right: Chat Panel ── */
+        .cam-chat-panel {
+            width: 280px; min-width: 260px; display: flex; flex-direction: column;
+            background: #181818; border-left: 1px solid #2a2a2a;
+        }
+        .cam-chat-panel .panel-title {
+            padding: 10px 14px; font-size: 13px; font-weight: 700;
+            border-bottom: 1px solid #2a2a2a; color: #e8760a; background: #1a1a1a;
+        }
+        .cam-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .cam-msg { font-size: 12px; line-height: 1.4; word-break: break-word; }
+        .cam-msg .cam-msg-user { font-weight: 700; color: #e8760a; }
+        .cam-msg .cam-msg-user.guest { color: #ff79a8; }
+        .cam-msg.system-msg { color: #777; font-style: italic; }
+        .cam-composer { display: flex; gap: 6px; padding: 8px; border-top: 1px solid #2a2a2a; }
+        .cam-composer input {
+            flex: 1; background: #222; border: 1px solid #333; border-radius: 8px;
+            color: #fff; padding: 7px 10px; font-size: 12px; outline: none;
+        }
+        .cam-composer input::placeholder { color: #555; }
+        .cam-composer button {
+            background: #e8760a; border: none; border-radius: 8px;
+            color: #fff; padding: 7px 12px; cursor: pointer; font-size: 14px;
+        }
+
+        /* ══ DISCLAIMER MODAL ══ */
+        .disclaimer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.93); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .disclaimer-box { background: #161616; border: 2px solid #e8760a; border-radius: 16px; width: 100%; max-width: 900px; display: flex; overflow: hidden; }
+        .disc-left { flex: 1; padding: 28px 24px; border-right: 1px solid #2a2a2a; overflow-y: auto; max-height: 90vh; }
+        .disc-logo { font-size: 22px; font-weight: 800; color: #e8760a; margin-bottom: 4px; }
+        .disc-left h2 { font-size: 17px; color: #fff; margin-bottom: 16px; line-height: 1.4; }
+        .warning-block { border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; font-size: 12.5px; line-height: 1.6; }
+        .warning-block.red    { background: rgba(192,57,43,0.18); border: 1px solid #c0392b; color: #ffaaaa; }
+        .warning-block.orange { background: rgba(232,118,10,0.15); border: 1px solid #e8760a; color: #ffcc88; }
+        .warning-block.grey   { background: rgba(80,80,80,0.25); border: 1px solid #555; color: #bbb; }
+        .warning-block strong { color: #fff; }
+        .disc-right { width: 320px; flex-shrink: 0; padding: 28px 24px; display: flex; flex-direction: column; justify-content: center; }
+        .disc-right h3 { font-size: 14px; color: #e8760a; margin-bottom: 14px; font-weight: 700; letter-spacing: 0.5px; }
+        .disc-checks { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+        .disc-checks label { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #ccc; cursor: pointer; line-height: 1.5; }
+        .disc-checks label span { flex: 1; }
+        .disc-checks input[type=checkbox] { margin-top: 3px; accent-color: #e8760a; width: 16px; height: 16px; flex-shrink: 0; }
+        .disc-enter-btn { width: 100%; padding: 13px; background: #e8760a; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; opacity: 0.35; pointer-events: none; transition: opacity 0.3s; }
+        .disc-enter-btn.ready { opacity: 1; pointer-events: all; }
+        .disc-leave-link { display: block; text-align: center; margin-top: 12px; color: #555; font-size: 12px; text-decoration: underline; cursor: pointer; }
+
+        /* Mobile — stack vertically */
+        @media (max-width: 768px) {
+            .disclaimer-box { flex-direction: column; max-width: 500px; }
+            .disc-left { border-right: none; border-bottom: 1px solid #2a2a2a; padding: 20px 16px; }
+            .disc-right { width: 100%; padding: 20px 16px; }
+            .cam-layout { flex-direction: column; }
+            .cam-chat-panel { width: 100%; min-height: 200px; flex: 0.5; border-left: none; border-top: 1px solid #2a2a2a; display: flex; }
+            .cam-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .cam-controls { flex-wrap: wrap; gap: 8px; }
+            .ctrl-btn { padding: 8px 12px; font-size: 18px; }
+            .cam-grid { grid-template-columns: 1fr; }
+            .warning-block { font-size: 12px; padding: 10px 12px; }
+            .disc-checks label { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     DISCLAIMER MODAL — must accept before entering
+══════════════════════════════════════════════════════════ -->
+<div class="disclaimer-overlay" id="disclaimerOverlay">
+    <div class="disclaimer-box">
+
+        <!-- LEFT: Warnings -->
+        <div class="disc-left">
+            <div class="disc-logo">Caught Me</div>
+            <h2>⚠️ Live Cam Room — Important Warnings</h2>
+
+            <div class="warning-block red">
+                <strong>🔴 RECORDING WARNING:</strong> Other users <strong>may record</strong> your webcam session without your knowledge using third-party software. <strong>Once you broadcast your face or body, you have no control over how that footage is used, stored, or shared.</strong> We strongly advise caution.
+            </div>
+            <div class="warning-block orange">
+                <strong>⚠️ LEGAL NOTICE:</strong> You <strong>must be 18 years of age or older</strong> to use this feature. It is illegal to expose minors to adult content. Any user found to be underage will be permanently banned and reported to the appropriate authorities.
+            </div>
+            <div class="warning-block orange">
+                <strong>📵 NO SCREENSHOTS / NO RECORDING:</strong> Recording, screenshotting, or distributing any content from this cam room without the express consent of all participants is <strong>strictly prohibited</strong> and may be illegal under your local laws.
+            </div>
+            <div class="warning-block grey">
+                <strong>⚖️ DISCLAIMER — NOT RESPONSIBLE:</strong> Caught Me is a platform that connects users. We do <strong>not</strong> monitor, record, or store webcam streams. We are <strong>not responsible</strong> for any content broadcast by users, any recordings made by third parties, or any consequences arising from your voluntary participation in live cam sessions. You use this feature entirely <strong>at your own risk</strong>.
+            </div>
+        </div>
+
+        <!-- RIGHT: Agree & Enter -->
+        <div class="disc-right">
+            <h3>✅ CONFIRM TO CONTINUE</h3>
+            <div class="disc-checks">
+                <label>
+                    <input type="checkbox" id="chkAge" onchange="checkAllAgreed()">
+                    <span>I confirm that I am <strong>18 years of age or older</strong>.</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="chkRecord" onchange="checkAllAgreed()">
+                    <span>I understand that my webcam session <strong>may be recorded</strong> by other users and I accept this risk.</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="chkNotRec" onchange="checkAllAgreed()">
+                    <span>I agree <strong>not to record</strong> other users' webcam sessions without their consent.</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="chkTerms" onchange="checkAllAgreed()">
+                    <span>I have read and agree to the <a href="terms.html" target="_blank" style="color:#e8760a;">Terms of Service</a>. I understand Caught Me is <strong>not responsible</strong> for any content arising from this session.</span>
+                </label>
+            </div>
+            <button class="disc-enter-btn" id="enterCamBtn" onclick="enterCamRoom()">
+                Enter Live Cam Room →
+            </button>
+            <a class="disc-leave-link" href="index.html">← No thanks, take me back</a>
+        </div>
+
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN CAM ROOM UI
+══════════════════════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;height:100vh;">
+
+    <!-- Top Bar -->
+    <div class="cam-topbar">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span class="logo">Caught Me</span>
+            <span class="room-tag"><i class="fa-solid fa-video"></i> Live Cam Room</span>
+            <span id="recIndicator" style="display:none;font-size:12px;color:#e74c3c;">
+                <span class="rec-dot"></span> LIVE
+            </span>
+        </div>
+        <div class="right-bar">
+            <span class="username-tag" id="topbarName">Guest</span>
+            <a class="btn-leave-cam" href="index.html" onclick="stopCam()">Leave</a>
+        </div>
+    </div>
+
+    <div class="cam-layout">
+
+        <!-- Cam Grid + Controls -->
+        <div class="cam-main">
+            <div class="cam-grid" id="camGrid">
+                <!-- Tiles injected by JS -->
+                <div class="cam-tile no-cam-placeholder" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#444;aspect-ratio:16/9;background:#111;">
+                    <div style="font-size:48px;"><i class="fa-solid fa-video"></i></div>
+                    <div style="font-size:14px;">Turn on your camera to join</div>
+                    <div style="font-size:12px;color:#555;">Other users will appear here when they go live</div>
+                </div>
+            </div>
+
+            <!-- My Camera Preview + Controls -->
+            <div class="cam-controls">
+                <button class="ctrl-btn" id="btnCam" onclick="toggleCam()" title="Toggle Camera">
+                    <span id="camIcon">📷</span>
+                    <label>Camera</label>
+                </button>
+                <button class="ctrl-btn" id="btnMic" onclick="toggleMic()" title="Toggle Microphone">
+                    <span id="micIcon">🎙️</span>
+                    <label>Mic</label>
+                </button>
+                <button class="ctrl-btn" id="btnScreen" onclick="toggleScreen()" title="Share Screen">
+                    <span>🖥️</span>
+                    <label>Screen</label>
+                </button>
+                <button class="ctrl-btn" onclick="toggleFullscreen()" title="Fullscreen">
+                    <span>⛶</span>
+                    <label>Fullscreen</label>
+                </button>
+                <button class="ctrl-btn danger" onclick="leaveCam()" title="Leave Cam">
+                    <span>📵</span>
+                    <label>Stop Cam</label>
+                </button>
+            </div>
+        </div>
+
+        <!-- Side Chat -->
+        <div class="cam-chat-panel">
+            <div class="panel-title"><i class="fa-solid fa-comments"></i> Room Chat</div>
+            <div class="cam-messages" id="camMessages">
+                <div class="cam-msg system-msg">Welcome to Live Cam Chat! Be respectful.</div>
+                <div class="cam-msg system-msg" style="color:#c0392b;">⚠️ Recording other users without consent is prohibited.</div>
+            </div>
+            <div class="cam-composer">
+                <input type="text" id="camChatInput" placeholder="Type a message..." maxlength="300">
+                <button onclick="sendCamMsg()">➤</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ════════════════════════════════════════════════
+    //  AUTH CHECK
+    // ════════════════════════════════════════════════
+    if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+        window.location.href = 'login.html';
+    }
+
+    // ════════════════════════════════════════════════
+    //  CONFIG
+    // ════════════════════════════════════════════════
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmrXdujt1sE-Eeyeuh7k-GuwUGWtxLcNS8GRTHbsB4-hs8YW5FeetrUrGLXEI539ly/exec';
+    const urlParams   = new URLSearchParams(window.location.search);
+    const rawUsername = urlParams.get('username') || 'User';
+    const isGuest     = urlParams.get('guest') !== 'false';
+    const displayUsername = isGuest ? `Guest-${rawUsername}` : rawUsername;
+
+    document.getElementById('topbarName').textContent = displayUsername;
+
+    // ════════════════════════════════════════════════
+    //  DATASET VIDEOS — HuggingFace raw URLs
+    // ════════════════════════════════════════════════
+    const ALL_VIDEOS = [
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Beautiful-girl-doing-web-cam-chat_Media_G-agKtCRHYY_001_480p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Bea_Media_a1-PV0yloqU_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Chr_Media_aTN1AEws590_002_720p (1).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Chr_Media_aTN1AEws590_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_2Pbh9uX_iD8_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_GdhCadsv3og_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_IBh00ESuGHo_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_LchAQMK-GqE_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_R0c89lMugsA_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_R0v9tWtt7UY_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_Y88wGtEMmLM_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_drUC90ibMuE_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_eLis5PC2ogg_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_eZN8qz8jSjI_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Han_Media_D0snwVA8Y-s_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Han_Media_ln2uu7HkZtk_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Han_Media_opeP4KUEzSY_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Old_Media_nr4EG7iucNY_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Filipino-Beauty_Media_P1naAoPKSRw_001_480p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_beautiful-girl-in-front-of-webcam_Media_BMELOi28Lic_001_480p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_hit-me-in-my-nostalgia_Media_r95xlWYdtJc_002_480p (2).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_sabrinacarpenter-Please-Please-Please-C_Media_eaBll4XO5VA_001_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_school-makeup-no-talking_Media_VzKKPnac6FI_002_720p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_video-para-Many-cam_Media_EiS0zkPmHck_001_240p.mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (1).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (10).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (11).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (12).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (13).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (14).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (15).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (16).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (17).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (18).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (19).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (2).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (20).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (3).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (4).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (5).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (6).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (7).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (8).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback (9).mp4",
+        "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback.mp4"
+    ];
+
+    // Fake usernames for simulated cams
+    const FAKE_NAMES = [
+        'Priya_F','HotDesi92','AngelFace','Nandini_G','RoseGirl','SweetMeera',
+        'DesiHot21','Kavya_Live','PinkPetal','CuriousSoul','NaughtyN','Riya99',
+        'SonaLive','MissIndia','DarkAngel','BlueStar','Lily_cam','SakshiLive',
+        'SunflowerG','ChoclateMilk','PoojaXO','AnonymousF','WildRose','MiraLive',
+        'SexyShweta','Pari_Cam','StarGirl88','NidaLive','HindiHot','TaruLive',
+    ];
+
+    // ════════════════════════════════════════════════
+    //  DISCLAIMER
+    // ════════════════════════════════════════════════
+    function checkAllAgreed() {
+        const all = ['chkAge','chkRecord','chkNotRec','chkTerms'].every(id => document.getElementById(id).checked);
+        document.getElementById('enterCamBtn').classList.toggle('ready', all);
+    }
+
+    async function enterCamRoom() {
+        const btn = document.getElementById('enterCamBtn');
+        btn.textContent = "Requesting Camera...";
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
+
+        try {
+            await toggleCam(true);
+        } catch (err) {
+            alert("Camera access denied or unavailable. You must allow camera access to join this room.");
+            btn.textContent = "Enter Live Cam Room →";
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'all';
+            return;
+        }
+
+        document.getElementById('disclaimerOverlay').style.display = 'none';
+        addCamSystemMsg('✅ You entered the cam room. You are now LIVE!');
+        addCamSystemMsg('⚠️ Reminder: Sessions may be recorded by other users.');
+        startSimulatedCams();
+        fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
+            body: JSON.stringify({ action:'login', username: displayUsername, room:'cam-room', gender:'', ip:'' }) });
+    }
+
+    // ════════════════════════════════════════════════
+    //  SIMULATED CAM TILES (from dataset videos)
+    // ════════════════════════════════════════════════
+    let activeTiles  = {}; // id -> { el, name, videoUrl }
+    let tileCounter  = 0;
+    let usedVideos   = new Set();
+    let usedNames    = new Set();
+
+    function pickRandom(arr, usedSet, max) {
+        const available = arr.filter(x => !usedSet.has(x));
+        if (available.length === 0) { usedSet.clear(); return pickRandom(arr, usedSet, max); }
+        const pick = available[Math.floor(Math.random() * available.length)];
+        usedSet.add(pick);
+        return pick;
+    }
+
+    function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+    function addSimCamTile() {
+        if (Object.keys(activeTiles).length >= 12) return; // max 12 tiles
+
+        const id      = ++tileCounter;
+        const name    = pickRandom(FAKE_NAMES, usedNames, 10);
+        const vidUrl  = pickRandom(ALL_VIDEOS, usedVideos, 5);
+        const grid    = document.getElementById('camGrid');
+
+        // Remove placeholder if present
+        document.querySelector('.no-cam-placeholder')?.remove();
+
+        const tile = document.createElement('div');
+        tile.className = 'cam-tile';
+        tile.id        = 'simtile-' + id;
+        tile.style.cursor = 'pointer';
+        tile.title     = name;
+
+        tile.innerHTML = `
+            <div style="position:relative;width:100%;height:100%;background:#111;">
+                <video autoplay loop muted playsinline
+                    style="width:100%;height:100%;object-fit:cover;display:block;"
+                    onerror="this.parentElement.innerHTML='<div class=no-cam style=display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:6px;><img src=https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)} style=width:60px;height:60px;border-radius:50%;><span style=color:#888;font-size:12px;>Loading cam...</span></div>'"
+                >
+                    <source src="${vidUrl}" type="video/mp4">
+                </video>
+                <div style="position:absolute;top:8px;left:8px;">
+                    <span style="background:rgba(0,0,0,0.6);color:#4caf50;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:flex;align-items:center;gap:4px;">
+                        <span style="width:7px;height:7px;background:#4caf50;border-radius:50%;display:inline-block;animation:blink 1.2s infinite;"></span> LIVE
+                    </span>
+                </div>
+            </div>
+            <div class="tile-label">
+                ${name}
+                <div class="cam-icons">
+                    <span title="Fullscreen" onclick="event.stopPropagation();toggleTileFS('simtile-${id}')">⛶</span>
+                    <span title="Mute" onclick="event.stopPropagation();muteTile('simtile-${id}')">🔇</span>
+                </div>
+            </div>
+        `;
+
+        tile.addEventListener('click', () => openUserModal(name, 'Female'));
+        grid.appendChild(tile);
+
+        // Try to play video
+        const vid = tile.querySelector('video');
+        vid?.play().catch(() => {});
+
+        activeTiles[id] = { el: tile, name, videoUrl: vidUrl };
+        addCamSystemMsg(`<i class="fa-solid fa-video"></i> ${name} joined the cam room.`);
+        updateCamCount();
+    }
+
+    function removeSimCamTile() {
+        const ids = Object.keys(activeTiles);
+        if (ids.length === 0) return;
+        const id = ids[Math.floor(Math.random() * ids.length)];
+        const { el, name } = activeTiles[id];
+        // Fade out
+        el.style.transition = 'opacity 1s';
+        el.style.opacity    = '0';
+        setTimeout(() => {
+            el.remove();
+            delete activeTiles[id];
+            usedNames.delete(name);
+            addCamSystemMsg(`📴 ${name} disconnected.`);
+            updateCamCount();
+            showPlaceholderIfEmpty();
+        }, 1000);
+    }
+
+    function showPlaceholderIfEmpty() {
+        if (Object.keys(activeTiles).length === 0 && !myCamTile) {
+            const ph = document.createElement('div');
+            ph.className = 'cam-tile no-cam-placeholder';
+            ph.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#444;aspect-ratio:16/9;background:#111;';
+            ph.innerHTML = '<div style="font-size:48px;"><i class="fa-solid fa-video"></i></div><div style="font-size:14px;">Turn on your camera to join</div>';
+            document.getElementById('camGrid').appendChild(ph);
+        }
+    }
+
+    function updateCamCount() {
+        const count = Object.keys(activeTiles).length + (myCamTile ? 1 : 0);
+        document.getElementById('recIndicator').style.display = count > 0 ? 'inline-flex' : 'none';
+    }
+
+    function startSimulatedCams() {
+        // Start with 4-6 random cams immediately
+        const initial = 4 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < initial; i++) {
+            setTimeout(() => addSimCamTile(), i * 600);
+        }
+
+        // Every 8-20s randomly connect or disconnect a cam
+        function scheduleNext() {
+            const delay = 8000 + Math.random() * 12000;
+            setTimeout(() => {
+                const count = Object.keys(activeTiles).length;
+                const action = count < 3 ? 'add' : count > 10 ? 'remove' : (Math.random() > 0.4 ? 'add' : 'remove');
+                if (action === 'add') addSimCamTile();
+                else removeSimCamTile();
+                scheduleNext();
+            }, delay);
+        }
+        scheduleNext();
+    }
+
+    // Tile controls
+    function toggleTileFS(tileId) {
+        const el = document.getElementById(tileId);
+        if (!el) return;
+        if (!document.fullscreenElement) el.requestFullscreen().catch(()=>{});
+        else document.exitFullscreen();
+    }
+    function muteTile(tileId) {
+        const vid = document.querySelector(`#${tileId} video`);
+        if (vid) { vid.muted = !vid.muted; }
+    }
+
+    // ════════════════════════════════════════════════
+    //  WEBCAM — getUserMedia
+    // ════════════════════════════════════════════════
+    let localStream    = null;
+    let camOn          = false;
+    let micOn          = false;
+    let screenStream   = null;
+    let myCamTile      = null;
+
+    async function toggleCam(throwOnError = false) {
+        if (!camOn) {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: micOn });
+                camOn = true; micOn = localStream.getAudioTracks().length > 0;
+                showMyCam(localStream);
+                document.getElementById('btnCam').classList.add('active');
+                document.getElementById('camIcon').textContent = '🎥';
+                addCamSystemMsg('<i class="fa-solid fa-video"></i> You are now LIVE. Remember: others may record you.');
+            } catch(err) {
+                addCamSystemMsg(`❌ Camera error: ${err.message}`);
+                if (throwOnError === true) throw err;
+            }
+        } else { stopLocalStream(); }
+    }
+
+    function stopLocalStream() {
+        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+        if (myCamTile)   { myCamTile.remove(); myCamTile = null; }
+        camOn = false; micOn = false;
+        document.getElementById('btnCam').classList.remove('active');
+        document.getElementById('camIcon').textContent = '📷';
+        addCamSystemMsg('Camera off.');
+    }
+
+    async function toggleMic() {
+        if (!camOn) { addCamSystemMsg('Turn on your camera first.'); return; }
+        if (!micOn) {
+            try {
+                const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
+                ms.getAudioTracks().forEach(t => localStream.addTrack(t));
+                micOn = true;
+                document.getElementById('btnMic').classList.add('active');
+                document.getElementById('micIcon').textContent = '🎤';
+            } catch(e) { addCamSystemMsg('Cannot access microphone.'); }
+        } else {
+            if (localStream) localStream.getAudioTracks().forEach(t => { t.stop(); localStream.removeTrack(t); });
+            micOn = false;
+            document.getElementById('btnMic').classList.remove('active');
+            document.getElementById('micIcon').textContent = '🎙️';
+        }
+    }
+
+    async function toggleScreen() {
+        if (!screenStream) {
+            try {
+                screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                showScreenTile(screenStream);
+                document.getElementById('btnScreen').classList.add('active');
+                screenStream.getVideoTracks()[0].onended = () => {
+                    screenStream = null;
+                    document.getElementById('btnScreen').classList.remove('active');
+                    document.getElementById('screenTile')?.remove();
+                };
+            } catch(e) {}
+        } else {
+            screenStream.getTracks().forEach(t => t.stop()); screenStream = null;
+            document.getElementById('btnScreen').classList.remove('active');
+            document.getElementById('screenTile')?.remove();
+        }
+    }
+
+    function toggleFullscreen() {
+        const el = document.querySelector('.cam-grid');
+        if (!document.fullscreenElement) el.requestFullscreen().catch(()=>{});
+        else document.exitFullscreen();
+    }
+
+    function showMyCam(stream) {
+        document.querySelector('.no-cam-placeholder')?.remove();
+        myCamTile = document.createElement('div');
+        myCamTile.className = 'cam-tile my-cam';
+        myCamTile.id = 'myCamTile';
+        const vid = document.createElement('video');
+        vid.srcObject = stream; vid.muted = true; vid.autoplay = true; vid.playsinline = true;
+        myCamTile.appendChild(vid);
+        const label = document.createElement('div');
+        label.className = 'tile-label';
+        label.innerHTML = `${displayUsername} (You) <span style="font-size:10px;background:#e8760a;padding:2px 6px;border-radius:10px;margin-left:6px;">LIVE</span>`;
+        myCamTile.appendChild(label);
+        document.getElementById('camGrid').prepend(myCamTile);
+    }
+
+    function showScreenTile(stream) {
+        const tile = document.createElement('div');
+        tile.className = 'cam-tile'; tile.id = 'screenTile';
+        const vid = document.createElement('video');
+        vid.srcObject = stream; vid.autoplay = true; vid.playsinline = true; vid.muted = true;
+        tile.appendChild(vid);
+        const label = document.createElement('div');
+        label.className = 'tile-label'; label.textContent = `${displayUsername} - Screen`;
+        tile.appendChild(label);
+        document.getElementById('camGrid').prepend(tile);
+    }
+
+    function stopCam() {
+        stopLocalStream();
+        if (screenStream) { screenStream.getTracks().forEach(t => t.stop()); screenStream = null; }
+    }
+
+    function leaveCam() {
+        stopCam();
+        addCamSystemMsg('You left the cam. Redirecting...');
+        setTimeout(() => window.location.href = 'index.html', 1200);
+    }
+
+    // ════════════════════════════════════════════════
+    //  USER MODAL (click on a cam tile)
+    // ════════════════════════════════════════════════
+    function openUserModal(username, gender) {
+        // Simple action popup
+        const existing = document.getElementById('quickModal');
+        if (existing) existing.remove();
+        const m = document.createElement('div');
+        m.id = 'quickModal';
+        m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
+        m.innerHTML = `
+            <div style="background:#1e1e1e;border:1px solid #444;border-radius:14px;padding:24px;width:300px;color:#fff;position:relative;">
+                <button onclick="document.getElementById('quickModal').remove()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#999;font-size:20px;cursor:pointer;">✕</button>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}" style="width:48px;height:48px;border-radius:50%;">
+                    <div>
+                        <div style="font-weight:700;font-size:15px;">${username}</div>
+                        <div style="font-size:12px;color:#aaa;">${gender || 'User'} · 🟢 LIVE</div>
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <button onclick="startWhisper('${username}');document.getElementById('quickModal').remove();" style="background:#2a4a7a;color:#7ab3ff;border:none;border-radius:8px;padding:9px;cursor:pointer;font-size:13px;font-weight:600;text-align:left;"><i class="fa-solid fa-comments"></i> Whisper (Private Message)</button>
+                    <button onclick="doIgnoreUser('${username}');document.getElementById('quickModal').remove();" style="background:#333;color:#ccc;border:none;border-radius:8px;padding:9px;cursor:pointer;font-size:13px;font-weight:600;text-align:left;">🚫 Ignore</button>
+                    <button onclick="doReportUser('${username}');document.getElementById('quickModal').remove();" style="background:#5a2a00;color:#ff9944;border:none;border-radius:8px;padding:9px;cursor:pointer;font-size:13px;font-weight:600;text-align:left;">⚠️ Report</button>
+                </div>
+            </div>`;
+        document.body.appendChild(m);
+        m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+    }
+
+    function startWhisper(name) {
+        document.getElementById('camChatInput').value = `/w ${name} `;
+        document.getElementById('camChatInput').focus();
+    }
+    function doIgnoreUser(name) { addCamSystemMsg(`You are now ignoring ${name}.`); }
+    function doReportUser(name) {
+        fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
+            body: JSON.stringify({ action:'report', reporter: displayUsername, reported: name, room:'cam-room' }) });
+        addCamSystemMsg(`✅ Report submitted for ${name}.`);
+    }
+
+    // ════════════════════════════════════════════════
+    //  CAM ROOM CHAT (Google Sheets)
+    // ════════════════════════════════════════════════
+    let lastCamMsgCount = 0;
+
+    function addCamSystemMsg(text) {
+        const msgs = document.getElementById('camMessages');
+        const el = document.createElement('div');
+        el.className = 'cam-msg system-msg'; el.textContent = text;
+        msgs.appendChild(el); msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function addCamMsg(username, text) {
+        const msgs = document.getElementById('camMessages');
+        const isG  = username.startsWith('Guest-');
+        const el = document.createElement('div');
+        el.className = 'cam-msg';
+        el.innerHTML = `<span class="cam-msg-user ${isG ? 'guest' : ''}">${username}:</span> ${text}`;
+        msgs.appendChild(el); msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function sendCamMsg() {
+        const input = document.getElementById('camChatInput');
+        const text  = input.value.trim(); if (!text) return;
+        addCamMsg(displayUsername, text); input.value = ''; lastCamMsgCount++;
+        fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
+            body: JSON.stringify({ action:'chat', room:'cam-room', username: displayUsername, message: text, mediaUrl:'' }) });
+    }
+
+    document.getElementById('camChatInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendCamMsg(); });
+
+    function fetchCamMessages() {
+        fetch(`${SCRIPT_URL}?action=getMessages&room=cam-room`)
+            .then(r => r.json())
+            .then(data => {
+                if (!Array.isArray(data)) return;
+                if (data.length > lastCamMsgCount) {
+                    data.slice(lastCamMsgCount).forEach(msg => { if (msg.username !== displayUsername) addCamMsg(msg.username, msg.message); });
+                    lastCamMsgCount = data.length;
+                }
+            }).catch(() => {});
+    }
+
+    setInterval(fetchCamMessages, 4000);
+
+    // ════════════════════════════════════════════════
+    //  SIMULATE CHAT MESSAGES from fake users
+    // ════════════════════════════════════════════════
+    const FAKE_MSGS = [
+        'hey everyone 👋', 'anyone wanna talk?', 'hi hi hi', 'omg this is fun',
+        'anyone from india?', 'heyy 😊', 'yo whats good', 'joining now',
+        'can anyone see me?', '😍😍', 'hello from delhi', 'hi baby', 'good evening all',
+        'first time here lol', 'hi from mumbai', 'anyone else on cam?',
+    ];
+
+    function sendFakeChat() {
+        const names = Object.values(activeTiles).map(t => t.name);
+        if (names.length === 0) return;
+        const name = names[Math.floor(Math.random() * names.length)];
+        const msg  = FAKE_MSGS[Math.floor(Math.random() * FAKE_MSGS.length)];
+        addCamMsg(name, msg);
+    }
+
+    function scheduleFakeChat() {
+        const delay = 6000 + Math.random() * 14000;
+        setTimeout(() => { sendFakeChat(); scheduleFakeChat(); }, delay);
+    }
+    scheduleFakeChat();
+</script>
+    <script src="common.js"></script>
+</body>
+</html>

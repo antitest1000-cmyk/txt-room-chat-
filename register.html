@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Caught Me - Register Account">
+    <title>Caught Me | Register</title>
+    <!-- Normal standard font -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner">
+        <div class="cookie-text">
+            We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept", you consent to our use of cookies.
+        </div>
+        <button class="cookie-btn" id="acceptCookiesBtn">Accept</button>
+    </div>
+
+    <!-- Side Navigation -->
+    <div class="side-nav-overlay" id="sideNavOverlay"></div>
+    <div class="side-nav" id="sideNav">
+        <div class="side-nav-header">
+            <button class="side-nav-close" id="sideNavCloseBtn">✕</button>
+        </div>
+        <ul class="side-nav-menu">
+            <li>
+                <a href="index.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-house"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Home</span>
+                        <span class="side-nav-desc">Back to the front page</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="rooms.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-comments"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Chat</span>
+                        <span class="side-nav-desc">Full list of chat rooms</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <nav class="top-bar">
+        <button class="menu-btn" id="hamburgerBtn">☰</button>
+        <div class="toggle-switch">
+            <input type="checkbox" id="theme-switch" checked>
+            <label for="theme-switch" class="switch"></label>
+        </div>
+    </nav>
+
+    <!-- Main Section (Dark Charcoal) -->
+    <section class="hero-section">
+        <div class="logo-container">
+            <a href="index.html" class="site-logo">
+                Caught Me
+                <span class="speech-tail"></span>
+            </a>
+        </div>
+
+        <div class="lounge-container" style="justify-content: center; max-width: 600px;">
+            <!-- Register Form -->
+            <div class="lounge-login-panel" style="width: 100%;">
+                <div class="panel-tab">Create Account</div>
+                <div class="panel-form-container">
+                    
+                    <form id="registerForm" class="lounge-form">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="emailInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="regUsernameInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="regPasswordInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <input type="password" id="regConfirmPasswordInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="regGenderInput" required>
+                                <option value="" disabled selected></option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="couple">Couple</option>
+                                <option value="trans">Transgender</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Birthdate</label>
+                            <input type="date" required value="2006-09-15">
+                        </div>
+                        
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms">By checking this box, you are indicating that you are at least 18 years of age and have read and agree to the <a href="terms.html">Terms of Use</a>.</label>
+                        </div>
+                        
+                        <div class="form-actions" style="margin-top: 15px;">
+                            <button type="submit" class="btn btn-primary" id="registerBtn" style="width: 100%;">Register Account</button>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 15px; font-size: 13px; color: #aaa;">
+                            Already have an account? <a id="loginLink" href="login.html" style="color: #e8760a;">Login here</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer" style="margin-top: auto;">
+        <div class="text-center mb-4">
+            <a href="index.html" class="btn-dark-grey">Select another chat room ▲</a>
+        </div>
+        <div class="copyright-bar">
+            <p>&copy; 2002 - 2026 Caught Me. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Set up the room context dynamically based on URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        let room = urlParams.get('room') || 'lounge-chat';
+        
+        // Update login link to keep the room parameter
+        document.getElementById('loginLink').href = 'login.html?room=' + encodeURIComponent(room);
+
+        const SERVER_URL = 'http://localhost:3000';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmrXdujt1sE-Eeyeuh7k-GuwUGWtxLcNS8GRTHbsB4-hs8YW5FeetrUrGLXEI539ly/exec';
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const username = document.getElementById('regUsernameInput').value;
+            const pass = document.getElementById('regPasswordInput').value;
+            const confirmPass = document.getElementById('regConfirmPasswordInput').value;
+            const gender = document.getElementById('regGenderInput').value;
+            
+            if (pass !== confirmPass) {
+                alert("Passwords do not match!");
+                return;
+            }
+            
+            const btn = document.getElementById('registerBtn');
+            btn.disabled = true;
+            btn.textContent = 'Registering...';
+            
+            // 1. Register to Node backend (SQLite) so they can actually log in
+            fetch(`${SERVER_URL}/api/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: username, password: pass })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    btn.disabled = false;
+                    btn.textContent = 'Register Account';
+                    return;
+                }
+                
+                // 2. Also save to Google Sheets (Users tab)
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'register',
+                        email: email,
+                        username: username,
+                        password: pass,
+                        gender: gender,
+                        ip: '2405:0201:7004:189d:f4e6:90e7:4b21:bcf9'
+                    })
+                }).then(() => {
+                    alert("Account created successfully! Please log in.");
+                    window.location.href = 'login.html?room=' + encodeURIComponent(room);
+                });
+            })
+            .catch(error => {
+                console.error('Error registering:', error);
+                alert('There was an error registering. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Register Account';
+            });
+        });
+    </script>
+    <script src="common.js"></script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caught Me | Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .blog-post {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: #ccc;
+        }
+        .blog-post-title {
+            color: #fff;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .blog-meta {
+            font-size: 0.85rem;
+            color: #e05a1e;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        .blog-content {
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+        .blog-content p {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner">
+        <div class="cookie-text">
+            We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept", you consent to our use of cookies.
+        </div>
+        <button class="cookie-btn" id="acceptCookiesBtn">Accept</button>
+    </div>
+
+    <!-- Side Navigation -->
+    <div class="side-nav-overlay" id="sideNavOverlay"></div>
+    <div class="side-nav" id="sideNav">
+        <div class="side-nav-header">
+            <button class="side-nav-close" id="sideNavCloseBtn">✕</button>
+        </div>
+        <ul class="side-nav-menu">
+            <li>
+                <a href="index.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-house"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Home</span>
+                        <span class="side-nav-desc">Back to the front page</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="rooms.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-comments"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Chat</span>
+                        <span class="side-nav-desc">Full list of chat rooms</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="blog.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Blog</span>
+                        <span class="side-nav-desc">Updates about the chat rooms</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="cam-chat.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-video"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Live Cams</span>
+                        <span class="side-nav-desc">Watch & broadcast live webcams</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <nav class="top-bar">
+        <button class="menu-btn" onclick="window.location.href='index.html'">←</button>
+        <div style="flex-grow: 1; text-align: center; color: white; font-weight: bold; font-size: 1.2rem;">Caught Me Blog</div>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="dark-section" style="padding-top: 60px; min-height: 100vh;">
+        <div class="blog-container">
+            <h1 class="text-center" style="color:#fff; margin-bottom: 40px;">Detailed Room Guides</h1>
+
+            <!-- Blog 1: Lounge -->
+            <article class="blog-post">
+                <h2 class="blog-post-title"><a href="blog-lounge.html" style="color: #fff; text-decoration: none;">The Ultimate Guide to Lounge Chat: Make Friends Online</a></h2>
+                <div class="blog-meta">
+                    <span>📅 October 2026</span>
+                    <span>👤 Admin Team</span>
+                </div>
+                <div class="blog-content">
+                    <p>Welcome to our comprehensive guide dedicated entirely to the nuances, history, and vibrant community of Lounge Chat. Discover everything you need to know about getting started, making friends, and mastering the chat...</p>
+                    <a href="blog-lounge.html" style="color: #e05a1e; font-weight: bold; text-decoration: none;">Read full guide →</a>
+                </div>
+            </article>
+
+            <!-- Blog 2: Sex Chat -->
+            <article class="blog-post">
+                <h2 class="blog-post-title"><a href="blog-sex-chat.html" style="color: #fff; text-decoration: none;">A Comprehensive Deep Dive into Adult Sex Chat Rooms</a></h2>
+                <div class="blog-meta">
+                    <span>📅 October 2026</span>
+                    <span>👤 Admin Team</span>
+                </div>
+                <div class="blog-content">
+                    <p>Welcome to our comprehensive guide dedicated entirely to the nuances, history, and vibrant community of Sex Chat. Discover how to safely explore your desires, connect with like-minded adults, and master the etiquette...</p>
+                    <a href="blog-sex-chat.html" style="color: #e05a1e; font-weight: bold; text-decoration: none;">Read full guide →</a>
+                </div>
+            </article>
+
+            <!-- Blog 3: RolePlay -->
+            <article class="blog-post">
+                <h2 class="blog-post-title"><a href="blog-roleplay.html" style="color: #fff; text-decoration: none;">Mastering the Art of Online RolePlay Chat</a></h2>
+                <div class="blog-meta">
+                    <span>📅 October 2026</span>
+                    <span>👤 Admin Team</span>
+                </div>
+                <div class="blog-content">
+                    <p>Welcome to our comprehensive guide dedicated entirely to the nuances, history, and vibrant community of RolePlay Chat. Learn how to build compelling characters, find the right partners, and create immersive storylines...</p>
+                    <a href="blog-roleplay.html" style="color: #e05a1e; font-weight: bold; text-decoration: none;">Read full guide →</a>
+                </div>
+            </article>
+
+            <!-- Blog 4: Younger4Older -->
+            <article class="blog-post">
+                <h2 class="blog-post-title"><a href="blog-younger4older.html" style="color: #fff; text-decoration: none;">Navigating Age-Gap Relationships in Younger4Older Chat</a></h2>
+                <div class="blog-meta">
+                    <span>📅 October 2026</span>
+                    <span>👤 Admin Team</span>
+                </div>
+                <div class="blog-content">
+                    <p>Welcome to our comprehensive guide dedicated entirely to the nuances, history, and vibrant community of Younger4Older. Explore the dynamics of age-gap relationships and find your perfect match...</p>
+                    <a href="blog-younger4older.html" style="color: #e05a1e; font-weight: bold; text-decoration: none;">Read full guide →</a>
+                </div>
+            </article>
+
+            <!-- Blog 5: Confessions -->
+            <article class="blog-post">
+                <h2 class="blog-post-title"><a href="blog-confessions.html" style="color: #fff; text-decoration: none;">The Psychology of Anonymous Confession Rooms</a></h2>
+                <div class="blog-meta">
+                    <span>📅 October 2026</span>
+                    <span>👤 Admin Team</span>
+                </div>
+                <div class="blog-content">
+                    <p>Welcome to our comprehensive guide dedicated entirely to the nuances, history, and vibrant community of Confessions. Discover the psychological benefits of unburdening your secrets in a judgment-free zone...</p>
+                    <a href="blog-confessions.html" style="color: #e05a1e; font-weight: bold; text-decoration: none;">Read full guide →</a>
+                </div>
+            </article>
+
+            <!-- Blog 6: BDSM Chat -->
+            <article class="blog-post">
+                <h2 class="blog-post-title"><a href="blog-bdsm.html" style="color: #fff; text-decoration: none;">Exploring Kink Safely: Your Guide to BDSM Chat Rooms</a></h2>
+                <div class="blog-meta">
+                    <span>📅 October 2026</span>
+                    <span>👤 Admin Team</span>
+                </div>
+                <div class="blog-content">
+                    <p>Welcome to our comprehensive guide dedicated entirely to the nuances, history, and vibrant community of BDSM Chat. Learn the fundamentals of safe, sane, and consensual exploration online...</p>
+                    <a href="blog-bdsm.html" style="color: #e05a1e; font-weight: bold; text-decoration: none;">Read full guide →</a>
+                </div>
+            </article>
+
+            <!-- Blog 7: Gay Chat -->
+            <article class="blog-post">
+                <h2 class="blog-post-title"><a href="blog-gay-chat.html" style="color: #fff; text-decoration: none;">Connecting the LGBTQ+ Community in Gay Chat Rooms</a></h2>
+                <div class="blog-meta">
+                    <span>📅 October 2026</span>
+                    <span>👤 Admin Team</span>
+                </div>
+                <div class="blog-content">
+                    <p>Welcome to our comprehensive guide dedicated entirely to the nuances, history, and vibrant community of Gay Chat. Find out how to connect, flirt, and build meaningful relationships in this dedicated space...</p>
+                    <a href="blog-gay-chat.html" style="color: #e05a1e; font-weight: bold; text-decoration: none;">Read full guide →</a>
+                </div>
+            </article>
+
+            <!-- Blog 8: Lesbian Chat -->
+            <article class="blog-post">
+                <h2 class="blog-post-title"><a href="blog-lesbian-chat.html" style="color: #fff; text-decoration: none;">Building Connections in Women-Only Lesbian Chat Spaces</a></h2>
+                <div class="blog-meta">
+                    <span>📅 October 2026</span>
+                    <span>👤 Admin Team</span>
+                </div>
+                <div class="blog-content">
+                    <p>Welcome to our comprehensive guide dedicated entirely to the nuances, history, and vibrant community of Lesbian Chat. Discover strategies for dating and making friends in a women-focused environment...</p>
+                    <a href="blog-lesbian-chat.html" style="color: #e05a1e; font-weight: bold; text-decoration: none;">Read full guide →</a>
+                </div>
+            </article>
+
+            <!-- Blog 9: Cam Chat -->
+            <article class="blog-post">
+                <h2 class="blog-post-title"><a href="blog-cam-chat.html" style="color: #fff; text-decoration: none;">Live Streaming Safely: The Complete Cam Chat Guide</a></h2>
+                <div class="blog-meta">
+                    <span>📅 October 2026</span>
+                    <span>👤 Admin Team</span>
+                </div>
+                <div class="blog-content">
+                    <p>Welcome to our comprehensive guide dedicated entirely to the nuances, history, and vibrant community of Cam Chat. Learn about webcam safety, lighting, angles, and engaging your audience face-to-face...</p>
+                    <a href="blog-cam-chat.html" style="color: #e05a1e; font-weight: bold; text-decoration: none;">Read full guide →</a>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="copyright-bar">
+            <p>&copy; 2002 - 2026 Caught Me. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="common.js"></script>
+</body>
+</html>

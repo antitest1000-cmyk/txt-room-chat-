@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Caught Me - Join Chat Room">
+    <title>Caught Me | Join Chat Room</title>
+    <!-- Normal standard font -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .login-tabs {
+            display: flex;
+            border-bottom: 2px solid #2a2a2a;
+            margin-bottom: 20px;
+        }
+
+        .login-tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 12px;
+            color: #888;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-tab-btn.active {
+            color: #e8760a;
+            border-bottom: 2px solid #e8760a;
+            margin-bottom: -2px;
+        }
+
+        .login-tab-btn:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <!-- Top Navigation Bar -->
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner">
+        <div class="cookie-text">
+            We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our
+            traffic. By clicking "Accept", you consent to our use of cookies.
+        </div>
+        <button class="cookie-btn" id="acceptCookiesBtn">Accept</button>
+    </div>
+
+    <!-- Side Navigation -->
+    <div class="side-nav-overlay" id="sideNavOverlay"></div>
+    <div class="side-nav" id="sideNav">
+        <div class="side-nav-header">
+            <button class="side-nav-close" id="sideNavCloseBtn">✕</button>
+        </div>
+        <ul class="side-nav-menu">
+            <li>
+                <a href="index.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-house"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Home</span>
+                        <span class="side-nav-desc">Back to the front page</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="rooms.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-comments"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Chat</span>
+                        <span class="side-nav-desc">Full list of chat rooms</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="blog.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Blog</span>
+                        <span class="side-nav-desc">Updates about the chat rooms</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="cam-chat.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-video"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Live Cams</span>
+                        <span class="side-nav-desc">Watch & broadcast live webcams</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <nav class="top-bar">
+        <button class="menu-btn" id="hamburgerBtn">☰</button>
+        <div class="toggle-switch">
+            <input type="checkbox" id="theme-switch" checked>
+            <label for="theme-switch" class="switch"></label>
+        </div>
+    </nav>
+
+    <!-- Main Section (Dark Charcoal) -->
+    <section class="hero-section">
+        <div class="logo-container">
+            <a href="index.html" class="site-logo">
+                Caught Me
+                <span class="speech-tail"></span>
+            </a>
+        </div>
+
+        <div class="lounge-container" style="justify-content: center; max-width: 600px;">
+            <!-- Login Form -->
+            <div class="lounge-login-panel" style="width: 100%;">
+                <div class="panel-tab" id="roomNameTab">Join Chat</div>
+
+                <!-- Login Tabs -->
+                <div class="login-tabs">
+                    <button class="login-tab-btn active" onclick="switchLoginTab('guest')">Guest</button>
+                    <button class="login-tab-btn" onclick="switchLoginTab('member')">Member</button>
+                </div>
+
+                <div class="panel-form-container">
+                    <!-- GUEST FORM -->
+                    <form action="chat.html" class="lounge-form" id="guestForm">
+                        <input type="hidden" id="roomInput" name="room" value="">
+                        <div class="form-group">
+                            <label>Nickname</label>
+                            <input type="text" id="usernameInput" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="genderInput" required>
+                                <option value="" disabled selected></option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="couple">Couple</option>
+                                <option value="trans">Transgender</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Birthdate</label>
+                            <input type="date" required value="2006-09-15">
+                        </div>
+
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms">By checking this box, you are indicating that you are at least 18 years
+                                of age and have read and agree to the <a href="terms.html">Terms of Use</a>.</label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="guestBtn"
+                                onclick="setGuestMode(true)">Chat As Guest</button>
+                        </div>
+                    </form>
+
+                    <!-- MEMBER FORM -->
+                    <form action="chat.html" class="lounge-form" id="memberForm" style="display: none;">
+                        <div class="form-group">
+                            <label>Username / Email</label>
+                            <input type="text" id="memberUsernameInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="memberPasswordInput" required>
+                        </div>
+
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+
+                        <div class="form-actions" style="margin-top: 15px;">
+                            <button type="submit" class="btn btn-secondary" id="loginBtn" onclick="setGuestMode(false)"
+                                style="width: 100%;">Login</button>
+                        </div>
+                        <div style="text-align: center; margin-top: 15px; font-size: 13px; color: #aaa;">
+                            Don't have an account? <a id="registerLink" href="register.html"
+                                style="color: #e8760a;">Register here</a>
+                        </div>
+                    </form>
+
+                    <div class="privacy-box text-center" style="margin-top: 20px;">
+                        As per our Privacy Policy, your IP 2405:0201:7004:189d:f4e6:90e7:4b21:bcf9 estimated location:
+                        IN will be logged.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer" style="margin-top: auto;">
+        <div class="text-center mb-4">
+            <a href="index.html" class="btn-dark-grey">Select another chat room ▲</a>
+        </div>
+        <div class="copyright-bar">
+            <p>&copy; 2002 - 2026 Caught Me. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Set up the room context dynamically based on URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        let room = urlParams.get('room') || 'general';
+
+        // Format room name (e.g. "lesbian-chat" -> "Lesbian Chat")
+        function formatRoomName(slug) {
+            return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        const formattedRoomName = formatRoomName(room);
+
+        // Auto-login if token exists
+        if (localStorage.getItem('cm_token')) {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            const lastRoom = localStorage.getItem('cm_room') || 'lounge-chat';
+            const lastUser = localStorage.getItem('cm_username');
+            if (lastUser) {
+                window.location.href = (lastRoom === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(lastRoom) + '&username=' + encodeURIComponent(lastUser) + '&guest=false';
+            }
+        }
+
+        // Update UI
+        document.getElementById('roomNameTab').textContent = formattedRoomName;
+        document.title = "Caught Me | Join " + formattedRoomName;
+        document.getElementById('roomInput').value = room;
+        document.getElementById('registerLink').href = 'register.html?room=' + encodeURIComponent(room);
+
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmrXdujt1sE-Eeyeuh7k-GuwUGWtxLcNS8GRTHbsB4-hs8YW5FeetrUrGLXEI539ly/exec';
+
+        // Handle Form Submission
+        let isGuest = true;
+        function setGuestMode(guest) {
+            isGuest = guest;
+        }
+
+        function switchLoginTab(tab) {
+            document.querySelectorAll('.login-tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (tab === 'guest') {
+                document.querySelectorAll('.login-tab-btn')[0].classList.add('active');
+                document.getElementById('guestForm').style.display = 'block';
+                document.getElementById('memberForm').style.display = 'none';
+            } else {
+                document.querySelectorAll('.login-tab-btn')[1].classList.add('active');
+                document.getElementById('guestForm').style.display = 'none';
+                document.getElementById('memberForm').style.display = 'block';
+            }
+        }
+
+        const SERVER_URL = 'http://localhost:3000';
+
+        function submitLogin(e, formType) {
+            e.preventDefault();
+
+            if (formType === 'guest') {
+                const username = document.getElementById('usernameInput').value;
+                const gender = document.getElementById('genderInput').value;
+                const btn = document.getElementById('guestBtn');
+                btn.textContent = 'Joining...';
+                btn.disabled = true;
+
+                // Legacy Guest Login
+                fetch(SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'login', username, room, gender, isGuest: true, ip: '' })
+                }).then(() => {
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    window.location.href = (room === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(room) + '&username=' + encodeURIComponent(username) + '&guest=true';
+                });
+            } else {
+                const username = document.getElementById('memberUsernameInput').value;
+                const password = document.getElementById('memberPasswordInput').value;
+                const btn = document.getElementById('loginBtn');
+                btn.textContent = 'Logging in...';
+                btn.disabled = true;
+
+                // Backend Login
+                fetch(`${SERVER_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            btn.disabled = false;
+                            btn.textContent = 'Login';
+                            return;
+                        }
+                        localStorage.setItem('cm_token', data.token);
+                        sessionStorage.setItem('isLoggedIn', 'true');
+
+                        if (data.user.role === 'OWNER') {
+                            if (confirm('Login successful. Go to Owner Panel? (Cancel to join Chat)')) {
+                                window.location.href = 'owner-panel.html';
+                                return;
+                            }
+                        }
+
+                        window.location.href = (room === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(room) + '&username=' + encodeURIComponent(username) + '&guest=false';
+                    })
+                    .catch(err => {
+                        alert('Server error.');
+                        btn.disabled = false;
+                        btn.textContent = 'Login';
+                    });
+            }
+        }
+
+        document.getElementById('guestForm').addEventListener('submit', (e) => submitLogin(e, 'guest'));
+        document.getElementById('memberForm').addEventListener('submit', (e) => submitLogin(e, 'member'));
+    </script>
+    <script src="common.js"></script>
+</body>
+
+</html>

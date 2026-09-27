@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Panel | Caught Me</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="owner-panel.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h1 style="color: #e8760a; margin: 0 0 20px 0; font-size: 24px; text-align: center;">Owner Panel</h1>
+            <button class="sidebar-nav-item active" onclick="switchTab('tab-users', this)"><i class="fa-solid fa-users" style="width:20px;"></i> Users</button>
+            <button class="sidebar-nav-item" onclick="switchTab('tab-personas', this)"><i class="fa-solid fa-user-secret" style="width:20px;"></i> Personas</button>
+            <button class="sidebar-nav-item" onclick="switchTab('tab-assignments', this)"><i class="fa-solid fa-link" style="width:20px;"></i> Assignments</button>
+            <button class="sidebar-nav-item" onclick="switchTab('tab-moderation', this)"><i class="fa-solid fa-shield-halved" style="width:20px;"></i> Moderation</button>
+            <button class="sidebar-nav-item" onclick="switchTab('tab-engine', this)"><i class="fa-solid fa-robot" style="width:20px;"></i> Bot Engine</button>
+            <button class="sidebar-nav-item" onclick="switchTab('tab-images', this)"><i class="fa-solid fa-image" style="width:20px;"></i> Website Images</button>
+            <div style="flex: 1;"></div>
+            <button id="logoutBtn" class="btn btn-danger" style="margin-top: 20px;"><i class="fa-solid fa-right-from-bracket"></i> Log Out</button>
+        </aside>
+
+        <main class="main-content">
+            <div class="panels-container">
+                <!-- Users Panel -->
+                <section class="panel tab-pane active" id="tab-users">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2 style="margin:0;"><i class="fa-solid fa-users"></i> Manage Users</h2>
+                        <button class="btn btn-primary" onclick="loadUsers()" style="font-size:12px; padding:7px 14px;">
+                            <i class="fa-solid fa-rotate-right"></i> Refresh
+                        </button>
+                    </div>
+
+                    <!-- Section 1: Registered Accounts -->
+                    <div style="margin-bottom:28px;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:8px 12px; background:rgba(232,118,10,0.1); border:1px solid rgba(232,118,10,0.25); border-radius:8px;">
+                            <i class="fa-solid fa-id-card" style="color:#e8760a; font-size:16px;"></i>
+                            <div>
+                                <div style="font-weight:700; color:#e8760a; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">Registered Accounts</div>
+                                <div style="font-size:11px; color:#888;">Users who signed up with a username &amp; password</div>
+                            </div>
+                            <span id="registeredCount" style="margin-left:auto; background:#333; color:#aaa; font-size:11px; padding:3px 10px; border-radius:20px;">—</span>
+                        </div>
+                        <ul id="usersList" class="list"></ul>
+                    </div>
+
+                    <!-- Section 2: Guest Users -->
+                    <div>
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:8px 12px; background:rgba(74,144,226,0.08); border:1px solid rgba(74,144,226,0.2); border-radius:8px;">
+                            <i class="fa-solid fa-user-clock" style="color:#4a90e2; font-size:16px;"></i>
+                            <div>
+                                <div style="font-weight:700; color:#4a90e2; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">Guest Users</div>
+                                <div style="font-size:11px; color:#888;">Chatted without registering — no account</div>
+                            </div>
+                            <span id="guestCount" style="margin-left:auto; background:#333; color:#aaa; font-size:11px; padding:3px 10px; border-radius:20px;">—</span>
+                        </div>
+                        <div id="guestsList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:10px;"></div>
+                    </div>
+                </section>
+
+                <!-- Personas Panel -->
+                <section class="panel tab-pane" id="tab-personas">
+                    <h2>Manage Personas</h2>
+                    <div class="form-group">
+                        <input type="text" id="newPersonaUsername" placeholder="Persona Username">
+                        <select id="newPersonaGender">
+                            <option value="female">Female</option>
+                            <option value="male">Male</option>
+                        </select>
+                        <select id="newPersonaRoom">
+                            <option value="">-- Select Room --</option>
+                            <option value="lounge-chat">Lounge Chat</option>
+                            <option value="sex-chat">Sex Chat</option>
+                            <option value="roleplay-chat">RolePlay Chat</option>
+                            <option value="bdsm-chat">BDSM Chat</option>
+                            <option value="gay-chat">Gay Chat</option>
+                            <option value="lesbian-chat">Lesbian Chat</option>
+                            <option value="confessions-chat">Confessions</option>
+                            <option value="younger4older-chat">Younger4Older</option>
+                        </select>
+                        <button id="btnCreatePersona" class="btn btn-primary">Create Persona</button>
+                    </div>
+                    <ul id="personasList" class="list"></ul>
+                </section>
+
+                <!-- Assignments Panel -->
+                <section class="panel tab-pane" id="tab-assignments">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2 style="margin:0;"><i class="fa-solid fa-link"></i> Persona Assignments</h2>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+                        <!-- Left: All Users -->
+                        <div style="background:#111; border:1px solid #2a2a2a; border-radius:10px; padding:16px;">
+                            <div style="font-size:13px; font-weight:700; color:#e8760a; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">
+                                <i class="fa-solid fa-users"></i> Select User (Operator)
+                            </div>
+                            <div style="font-size:12px; color:#888; margin-bottom:10px;">Choose which user gets control of a persona in a room:</div>
+                            <div id="assignUsersList" style="display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto;"></div>
+                        </div>
+
+                        <!-- Right: Assignment Form -->
+                        <div style="background:#111; border:1px solid #2a2a2a; border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:14px;">
+                            <div style="font-size:13px; font-weight:700; color:#e8760a; text-transform:uppercase; letter-spacing:0.5px;">
+                                <i class="fa-solid fa-sliders"></i> Assignment Details
+                            </div>
+
+                            <div class="form-group" style="margin:0;">
+                                <label style="color:#aaa; font-size:12px; margin-bottom:6px; display:block;">Selected User</label>
+                                <div id="assignSelectedUser" style="background:#1a1a1a; border:1px solid #333; border-radius:6px; padding:10px; color:#888; font-size:13px;">No user selected</div>
+                                <input type="hidden" id="assignOperatorId">
+                            </div>
+
+                            <div class="form-group" style="margin:0;">
+                                <label style="color:#aaa; font-size:12px; margin-bottom:6px; display:block;">Persona to Assign</label>
+                                <select id="assignPersonaId" style="width:100%;">
+                                    <option value="">-- Select Persona --</option>
+                                </select>
+                            </div>
+
+                            <button id="btnAssignPersona" class="btn btn-primary" style="margin-top:auto;">
+                                <i class="fa-solid fa-check"></i> Assign Persona
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Current Assignments -->
+                    <div style="margin-top:24px;">
+                        <div style="font-size:13px; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #2a2a2a;">
+                            <i class="fa-solid fa-list-check"></i> Current Assignments
+                        </div>
+                        <ul id="assignmentsList" class="list"></ul>
+                    </div>
+                </section>
+
+                <!-- Moderation Panel -->
+                <section class="panel tab-pane" id="tab-moderation">
+                    <h2>Room Moderation</h2>
+                    <div class="form-group">
+                        <select id="modRoomSelect">
+                            <option value="">-- Select Room to Edit --</option>
+                            <option value="lounge-chat">Lounge Chat</option>
+                            <option value="sex-chat">Sex Chat</option>
+                            <option value="roleplay-chat">RolePlay Chat</option>
+                            <option value="bdsm-chat">BDSM Chat</option>
+                            <option value="gay-chat">Gay Chat</option>
+                            <option value="lesbian-chat">Lesbian Chat</option>
+                            <option value="confessions-chat">Confessions</option>
+                            <option value="younger4older-chat">Younger4Older</option>
+                        </select>
+                        <textarea id="modBannedWords" rows="3" placeholder="Comma-separated banned words"></textarea>
+                        <label style="color:#aaa; font-size:14px; margin-top: 10px; cursor: pointer;">
+                            <input type="checkbox" id="modStrictMode"> Strict Mode (Ban on violation)
+                        </label>
+                        <button id="btnSaveMod" class="btn btn-primary" style="margin-top: 10px;">Save Rules</button>
+                        <span id="modStatus" style="margin-left: 10px; color: #4caf50; font-size:14px;"></span>
+                    </div>
+                </section>
+
+                <!-- Bot Engine Panel -->
+                <section class="panel tab-pane" id="tab-engine">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                        <h2 style="margin:0;"><i class="fa-solid fa-gear"></i> AI Bot Engine</h2>
+                        <div style="display:flex; align-items:center; gap: 15px;">
+                            <span id="engineStatusBadge" style="color: #f44336; font-size:14px; font-weight:600;">🔴 Offline</span>
+                            <button id="btnToggleEngine" class="btn btn-primary">Start Engine</button>
+                        </div>
+                    </div>
+
+                    <!-- Settings Row -->
+                    <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:15px; align-items:end; margin-bottom:20px;">
+                        <div class="form-group" style="margin:0;">
+                            <label style="color:#aaa; font-size:13px; font-weight:600;">Target Room</label>
+                            <select id="botRoomSelect">
+                                <option value="lounge-chat">Lounge Chat</option>
+                                <option value="sex-chat">Sex Chat</option>
+                                <option value="roleplay-chat">RolePlay Chat</option>
+                                <option value="bdsm-chat">BDSM Chat</option>
+                                <option value="gay-chat">Gay Chat</option>
+                                <option value="lesbian-chat">Lesbian Chat</option>
+                                <option value="confessions-chat">Confessions</option>
+                                <option value="younger4older-chat">Younger4Older</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label style="color:#aaa; font-size:13px; font-weight:600;">Response Chance (%)</label>
+                            <input type="number" id="responseChance" value="40" min="1" max="100">
+                        </div>
+                        <button id="btnAddBot" class="btn btn-primary">+ Add Bot</button>
+                    </div>
+
+                    <!-- Active Bots -->
+                    <div style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="margin:0; color:#ccc; font-size:16px;">Active Bots</h3>
+                        <span id="botCount" style="color:#888; font-size:13px;"></span>
+                    </div>
+                    <div id="botCardsList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:12px; margin-bottom:25px;"></div>
+
+                    <!-- Bot Media Pool -->
+                    <div style="background:rgba(0,0,0,0.2); border:1px solid #333; border-radius:10px; padding:18px; margin-bottom:20px;">
+                        <h3 style="margin:0 0 12px; font-size:15px; color:#ccc;">📸 Bot Media Pool <span style="font-size:12px; color:#666;">(bots randomly post these)</span></h3>
+                        <div style="display:flex; gap:10px; margin-bottom:12px;">
+                            <input type="text" id="mediaInput" placeholder="Paste image or video URL here..." style="flex:1; padding:10px; background:#111; color:#fff; border:1px solid #444; border-radius:6px;">
+                            <button class="btn btn-primary" onclick="addMedia()">Add</button>
+                        </div>
+                        <div id="mediaList" style="display:flex; flex-direction:column; gap:8px; max-height:180px; overflow-y:auto;"></div>
+                    </div>
+
+                    <!-- Activity Log -->
+                    <div id="botEngineLog" style="font-size:13px; color:#888; margin-bottom:8px;"></div>
+                    <div style="background:#000; border-radius:10px; border:1px solid #333; padding:12px; height:200px; overflow-y:auto; font-family:monospace; font-size:12px;" id="activityLog">
+                        <div style="color:#44aaff;">[System] Bot Engine ready. Start the engine to activate bots.</div>
+                    </div>
+                </section>
+
+                <!-- Website Images Panel -->
+                <section class="panel tab-pane" id="tab-images">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                        <h2 style="margin:0;"><i class="fa-solid fa-image"></i> Edit Website Images</h2>
+                        <button class="btn btn-primary" onclick="loadImages()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                    </div>
+                    <div id="imagesList" style="display:flex; flex-direction:column; gap:15px;">
+                        <p style="color:#888;">Loading images...</p>
+                    </div>
+                </section>
+
+            </div> <!-- End panels-container -->
+        </main>
+    </div>
+
+    <!-- Add Bot Modal -->
+    <div class="modal-overlay" id="addBotModal">
+        <div class="modal">
+            <h3><i class="fa-solid fa-robot"></i> Create New Bot</h3>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Username</label>
+                <input type="text" id="botUsername" placeholder="e.g. Chad99">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Gender</label>
+                <select id="botGender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Add to Room</label>
+                <select id="botAddRoom">
+                    <option value="lounge-chat">Lounge Chat</option>
+                    <option value="sex-chat">Sex Chat</option>
+                    <option value="roleplay-chat">RolePlay Chat</option>
+                    <option value="bdsm-chat">BDSM Chat</option>
+                    <option value="gay-chat">Gay Chat</option>
+                    <option value="lesbian-chat">Lesbian Chat</option>
+                    <option value="confessions-chat">Confessions</option>
+                    <option value="younger4older-chat">Younger4Older</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Persona Prompt</label>
+                <textarea id="botPersona" rows="5" placeholder="e.g. You are a 22yo college girl looking for fun chat. Short replies, casual tone..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" id="btnCancelBot">Cancel</button>
+                <button class="btn btn-primary" id="btnSaveBot"><i class="fa-solid fa-plus"></i> Create Bot</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Bot Modal -->
+    <div class="modal-overlay" id="editBotModal">
+        <div class="modal">
+            <h3><i class="fa-solid fa-pen-to-square"></i> Edit Bot</h3>
+            <input type="hidden" id="editBotId">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Username</label>
+                <input type="text" id="editBotUsername" placeholder="e.g. Chad99">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Gender</label>
+                <select id="editBotGender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Room</label>
+                <select id="editBotRoom">
+                    <option value="lounge-chat">Lounge Chat</option>
+                    <option value="sex-chat">Sex Chat</option>
+                    <option value="roleplay-chat">RolePlay Chat</option>
+                    <option value="bdsm-chat">BDSM Chat</option>
+                    <option value="gay-chat">Gay Chat</option>
+                    <option value="lesbian-chat">Lesbian Chat</option>
+                    <option value="confessions-chat">Confessions</option>
+                    <option value="younger4older-chat">Younger4Older</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Persona Prompt</label>
+                <textarea id="editBotPersona" rows="5" placeholder="Describe the bot's personality..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" id="btnCancelEditBot">Cancel</button>
+                <button class="btn btn-primary" id="btnSaveEditBot"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image History Modal -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal" style="max-width: 600px; width: 90%;">
+            <h3>Image History</h3>
+            <div id="historyList" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px; display:flex; flex-direction:column; gap:10px;">
+                <!-- History items loaded here -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="document.getElementById('historyModal').style.display='none'">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="owner-panel.js"></script>
+</body>
+</html>

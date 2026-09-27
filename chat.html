@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Caught Me | Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="chat.css?v=2">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        /* ── Moderation Modal ── */
+        .mod-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mod-overlay.active {
+            display: flex;
+        }
+
+        .mod-modal {
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 14px;
+            width: 320px;
+            padding: 24px;
+            color: #fff;
+            position: relative;
+        }
+
+        .mod-modal h3 {
+            margin: 0 0 6px;
+            font-size: 16px;
+            color: #e8760a;
+        }
+
+        .mod-modal .mod-avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .mod-modal .mod-avatar-row img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+        }
+
+        .mod-modal .mod-username {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .mod-modal .mod-gender {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .mod-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mod-btn {
+            padding: 9px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .mod-btn.whisper {
+            background: #2a4a7a;
+            color: #7ab3ff;
+        }
+
+        .mod-btn.ignore {
+            background: #333;
+            color: #ccc;
+        }
+
+        .mod-btn.report {
+            background: #5a2a00;
+            color: #ff9944;
+        }
+
+        .mod-btn.kick {
+            background: #4a0000;
+            color: #ff6666;
+        }
+
+        .mod-btn.ban {
+            background: #6b0000;
+            color: #ff3333;
+        }
+
+        .mod-btn:hover {
+            opacity: 0.85;
+        }
+
+        .mod-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* ── User search box ── */
+        .user-search {
+            padding: 6px 10px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+            outline: none;
+        }
+
+        .user-search::placeholder {
+            color: #666;
+        }
+
+        /* ── Friend added indicator ── */
+        .friend-tag {
+            font-size: 10px;
+            background: #1a4a1a;
+            color: #4caf50;
+            padding: 2px 6px;
+            border-radius: 20px;
+            margin-left: 4px;
+        }
+
+        /* ── Mod badge in user list ── */
+        .mod-badge {
+            font-size: 10px;
+            background: #e8760a;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 20px;
+            margin-left: 4px;
+        }
+
+        /* ── Room left sidebar links ── */
+        .sidebar-left .room-list li a {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 14px;
+            color: #e8760a;
+            text-decoration: none;
+        }
+
+        .sidebar-left .room-list li a:hover {
+            background: #2a2a2a;
+        }
+
+        /* ── Ignore list footer ── */
+        #ignoreCount {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* ── Scroll to bottom btn ── */
+        #scrollBottomBtn {
+            display: none;
+            position: absolute;
+            bottom: 70px;
+            right: 20px;
+            background: #e8760a;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ── User Dropdown Menu ── */
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            background: #fff;
+            color: #111;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-width: 210px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+            z-index: 9999;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        .user-dropdown.open {
+            display: block;
+        }
+
+        .user-menu-btn {
+            position: relative;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.15s;
+            color: #111;
+            text-decoration: none;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+
+        .dropdown-item .di-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-item .di-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .dropdown-item .di-label {
+            font-weight: 500;
+        }
+
+        .dropdown-item.danger .di-label {
+            color: #d32f2f;
+        }
+
+        .dropdown-item.danger .di-icon {
+            color: #d32f2f;
+        }
+
+        /* toggle switch inside dropdown */
+        .di-toggle {
+            width: 36px;
+            height: 20px;
+            background: #ccc;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .di-toggle.on {
+            background: #4caf50;
+        }
+
+        .di-toggle::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .di-toggle.on::after {
+            left: 18px;
+        }
+
+        /* ── Dark Mode is DEFAULT. Light Mode overrides it ── */
+        body.light-mode {
+            background: #f0f2f5 !important;
+            color: #111 !important;
+        }
+
+        body.light-mode .top-bar {
+            background: #ffffff !important;
+            border-bottom: 1px solid #ddd !important;
+            color: #111 !important;
+        }
+
+        body.light-mode .sidebar {
+            background: #ffffff !important;
+            border-color: #ddd !important;
+            color: #111 !important;
+        }
+
+        body.light-mode .chat-area {
+            background: #f8f9fa !important;
+        }
+
+        body.light-mode .messages-container {
+            background: #f8f9fa !important;
+        }
+
+        body.light-mode .composer-area {
+            background: #ffffff !important;
+            border-top: 1px solid #ddd !important;
+        }
+
+        body.light-mode .composer-input {
+            background: #f0f2f5 !important;
+            color: #111 !important;
+            border: 1px solid #ccc !important;
+        }
+
+        body.light-mode .user-list li {
+            border-color: #eee !important;
+        }
+
+        body.light-mode .user-name {
+            color: #222 !important;
+        }
+
+        body.light-mode .timestamp {
+            color: #888 !important;
+        }
+
+        body.light-mode .system-warning {
+            background: #fff3cd !important;
+        }
+
+        body.light-mode .room-list li a {
+            color: #333 !important;
+        }
+
+        body.light-mode .room-list li a:hover {
+            background: #e8f5e9 !important;
+        }
+
+        body.light-mode .sidebar-header h3 {
+            color: #222 !important;
+        }
+
+        body.light-mode .message-content {
+            color: #222 !important;
+        }
+
+        body.light-mode .btn-rooms {
+            background: #1b873f !important;
+        }
+
+        body.light-mode .user-dropdown {
+            background: #fff !important;
+            color: #111 !important;
+        }
+
+        body.light-mode .mini-avatar {
+            background: #e8760a !important;
+        }
+
+        body.light-mode #topbarUsername {
+            color: #111 !important;
+        }
+
+        body.light-mode .app-container {
+            background: #f0f2f5 !important;
+        }
+
+        /* ── Advanced Operator Panel ── */
+        #operatorPanel {
+            display: none;
+            flex-direction: column;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-top: 2px solid #e8760a;
+            border-bottom: 1px solid #333;
+            padding: 0;
+            font-size: 13px;
+        }
+
+        .op-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            flex-wrap: wrap;
+        }
+
+        .op-badge {
+            background: #e8760a;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .op-avatar-wrap {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .op-avatar-wrap img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #e8760a;
+        }
+
+        .op-online-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 9px;
+            height: 9px;
+            background: #4caf50;
+            border-radius: 50%;
+            border: 1px solid #111;
+        }
+
+        .op-persona-select {
+            background: #111;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            flex: 1;
+            min-width: 150px;
+            max-width: 260px;
+            cursor: pointer;
+        }
+
+        .op-persona-select:focus {
+            outline: 1px solid #e8760a;
+        }
+
+        .op-disclosure {
+            font-size: 10px;
+            color: #e8760a;
+            background: rgba(232, 118, 10, 0.12);
+            padding: 3px 8px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .op-actions {
+            display: flex;
+            gap: 6px;
+            margin-left: auto;
+        }
+
+        .op-btn {
+            background: #2a2a3e;
+            color: #ccc;
+            border: 1px solid #444;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .op-btn:hover {
+            background: #e8760a;
+            color: #fff;
+            border-color: #e8760a;
+        }
+
+        .op-btn.active {
+            background: #e8760a;
+            color: #fff;
+            border-color: #e8760a;
+        }
+
+        /* Persona grid */
+        #opPersonaGrid {
+            display: none;
+            padding: 8px 12px 10px;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-top: 1px solid #2a2a3e;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .op-persona-card {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: #1e1e2e;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .op-persona-card:hover {
+            border-color: #e8760a;
+        }
+
+        .op-persona-card.selected {
+            border-color: #e8760a;
+            background: rgba(232, 118, 10, 0.15);
+        }
+
+        .op-persona-card img {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+        }
+
+        .op-persona-card .op-card-name {
+            font-weight: 600;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .op-persona-card .op-card-room {
+            font-size: 10px;
+            color: #888;
+        }
+
+        .op-add-card {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: transparent;
+            border: 1px dashed #555;
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            color: #888;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .op-add-card:hover {
+            border-color: #e8760a;
+            color: #e8760a;
+        }
+
+        /* Quick Persona Modal */
+        #quickPersonaModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #quickPersonaModal.open {
+            display: flex;
+        }
+
+        .qp-modal-inner {
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 24px;
+            width: 340px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        .qp-modal-inner h3 {
+            margin: 0 0 6px;
+            color: #e8760a;
+            font-size: 16px;
+        }
+
+        .qp-modal-inner p {
+            margin: 0 0 16px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .qp-field {
+            margin-bottom: 12px;
+        }
+
+        .qp-field label {
+            display: block;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .qp-field input,
+        .qp-field select {
+            width: 100%;
+            box-sizing: border-box;
+            background: #111;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .qp-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .qp-actions button {
+            flex: 1;
+            padding: 9px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .qp-cancel {
+            background: #333;
+            color: #ccc;
+        }
+
+        .qp-save {
+            background: #e8760a;
+            color: #fff;
+        }
+
+        .qp-save:hover {
+            background: #d06808;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner">
+        <div class="cookie-text">
+            We use cookies to enhance your browsing experience. By clicking "Accept", you consent to our use of cookies.
+        </div>
+        <button class="cookie-btn" id="acceptCookiesBtn">Accept</button>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="top-bar">
+        <div class="top-bar-left">
+            <button class="btn-rooms" id="btn-rooms"><i class="fa-solid fa-comments"></i> Rooms</button>
+            <div class="room-tabs">
+                <div class="room-tab active" id="activeRoomTab">Lounge</div>
+            </div>
+        </div>
+        <div class="top-bar-right">
+            <button id="btn-users-mobile"
+                style="display:none; background:#1b873f; color:white; border:none; padding:5px 12px; border-radius:4px; font-weight:bold; margin-right:10px; cursor:pointer;">👥
+                Users</button>
+            <button id="btnAdminPanel"
+                style="display:none; background:#e8760a; color:white; border:none; padding:5px 12px; border-radius:4px; font-weight:bold; margin-right:10px; cursor:pointer;"><i class="fa-solid fa-gear"></i>
+                Admin Panel</button>
+            <button class="btn-leave"><a href="index.html">Leave</a></button>
+            <div class="user-menu-btn" id="userMenuBtn">
+                <span class="desktop-only" id="topbarUsername">Guest</span>
+                <div class="mini-avatar" id="topbarAvatar">G</div>
+                <span class="dropdown-icon">▼</span>
+
+                <!-- Dropdown Menu -->
+                <div class="user-dropdown" id="userDropdown">
+                    <!-- Guest-only: shown when user is a guest -->
+                    <div class="dropdown-item" id="ddCreateAccount" style="display:none;">
+                        <div class="di-left">
+                            <span class="di-icon">👤</span>
+                            <span class="di-label">Create an account</span>
+                        </div>
+                        <span style="font-size:18px; color:#999;">&#43;</span>
+                    </div>
+                    <!-- Member-only: shown when user is logged in -->
+                    <div class="dropdown-item" id="ddPublishCam">
+                        <div class="di-left">
+                            <span class="di-icon">📷</span>
+                            <span class="di-label">Publish cam</span>
+                        </div>
+                        <div class="di-toggle" id="togglePublishCam"></div>
+                    </div>
+                    <div class="dropdown-item" id="ddAcceptCalls">
+                        <div class="di-left">
+                            <span class="di-icon">📞</span>
+                            <span class="di-label">Accept calls</span>
+                        </div>
+                        <div class="di-toggle" id="toggleAcceptCalls"></div>
+                    </div>
+                    <div class="dropdown-item" id="ddPreferences">
+                        <div class="di-left">
+                            <span class="di-icon"><i class="fa-solid fa-gear"></i></span>
+                            <span class="di-label">Preferences</span>
+                        </div>
+                        <span style="font-size:13px;color:#aaa;">&#9776;</span>
+                    </div>
+                    <div class="dropdown-item" id="ddLightMode">
+                        <div class="di-left">
+                            <span class="di-icon">☀️</span>
+                            <span class="di-label">Light mode</span>
+                        </div>
+                        <div class="di-toggle" id="toggleLightMode"></div>
+                    </div>
+                    <div class="dropdown-item" id="ddSoundsOn">
+                        <div class="di-left">
+                            <span class="di-icon">🔔</span>
+                            <span class="di-label">Sounds on</span>
+                        </div>
+                        <div class="di-toggle on" id="toggleSoundsOn"></div>
+                    </div>
+                    <div class="dropdown-item" id="ddForum">
+                        <div class="di-left">
+                            <span class="di-icon"><i class="fa-solid fa-comments"></i></span>
+                            <span class="di-label">Forum</span>
+                        </div>
+                    </div>
+                    <!-- Guest-only: shown when user is a guest -->
+                    <div class="dropdown-item" id="ddLogin" style="display:none;">
+                        <div class="di-left">
+                            <span class="di-icon">🔑</span>
+                            <span class="di-label">Login</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-item danger" id="ddLogout">
+                        <div class="di-left">
+                            <span class="di-icon">🚪</span>
+                            <span class="di-label">Log out</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Mobile overlay (tap to close sidebars) -->
+        <div class="overlay" id="mobileOverlay"></div>
+
+        <!-- Left Sidebar: Rooms -->
+        <aside class="sidebar sidebar-left" id="sidebar-rooms">
+            <div class="sidebar-header">
+                <h3>Chat Rooms</h3>
+            </div>
+            <ul class="room-list" id="roomListSidebar">
+                <li><a href="#" onclick="switchRoom('lounge-chat')">Lounge Chat <span class="count">👥 1748</span></a>
+                </li>
+                <li><a href="#" onclick="switchRoom('sex-chat')">Sex Chat <span class="count">👥 562</span></a></li>
+                <li><a href="#" onclick="switchRoom('roleplay-chat')">RolePlay Chat <span class="count">👥
+                            316</span></a></li>
+                <li><a href="#" onclick="switchRoom('lesbian-chat')">Lesbian Chat <span class="count">👥 210</span></a>
+                </li>
+                <li><a href="#" onclick="switchRoom('gay-chat')">Gay Chat <span class="count">👥 188</span></a></li>
+                <li><a href="#" onclick="switchRoom('bdsm-chat')">BDSM Chat <span class="count">👥 421</span></a></li>
+                <li><a href="#" onclick="switchRoom('confessions-chat')">Confessions <span class="count">👥
+                            304</span></a></li>
+                <li><a href="#" onclick="switchRoom('younger4older-chat')">Younger4Older <span class="count">👥
+                            97</span></a></li>
+                <li><a href="login.html?room=cam-room" target="_blank"><i class="fa-solid fa-video"></i> Cam Room <span class="count">👥 143</span></a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Center: Chat Area -->
+        <main class="chat-area" style="position: relative;">
+
+            <!-- Messages Stream -->
+            <div class="messages-container" id="messages-container">
+                <!-- System Warning -->
+                <div class="message-group system-warning">
+                    <span class="icon">ℹ️</span>
+                    <div class="message-content">
+                        <strong>CHATTERS BEWARE,</strong> Hey <span class="user-blue"
+                            id="warningUsername">(Guest)</span>, avoid
+                        getting <strong>SCAMMED</strong>, use your head <strong>Never</strong> enter your card details.
+                        <strong>Never</strong> call or text random "girls". <strong>Never</strong> share your number.
+                        <strong>Never</strong> give a code. <strong>Never Give your Money</strong>. You will get
+                        <strong>NOTHING</strong> and <strong>100% SCAM</strong> "Girls" advertising their social
+                        usernames in public. <strong>100% SCAM</strong> "Police" threats or blackmail. <strong>Suspect
+                            abuse?</strong> Please use the report button, thank you!! 🚫
+                        <span class="timestamp" id="warningTime"></span>
+                    </div>
+                </div>
+                <!-- Messages injected by JS -->
+            </div>
+
+            <!-- Scroll to bottom button -->
+            <button id="scrollBottomBtn" title="Scroll to bottom">↓</button>
+
+            <!-- Advanced Operator Panel -->
+            <div id="operatorPanel">
+                <div class="op-bar">
+                    <span class="op-badge">🎭 Operator</span>
+                    <div class="op-avatar-wrap">
+                        <img id="opCurrentAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=operator"
+                            alt="persona">
+                        <span class="op-online-dot"></span>
+                    </div>
+                    <select id="personaSelect" class="op-persona-select">
+                        <option value="">👤 Send as myself</option>
+                    </select>
+                    <span id="personaDisclosure" class="op-disclosure" style="display:none;">ℹ️ Operator-Controlled
+                        Persona</span>
+                    <div class="op-actions">
+                        <button class="op-btn" id="btnTogglePersonaGrid" title="Show/hide all personas">👥
+                            Personas</button>
+                        <button class="op-btn" id="btnCreateQuickPersona" title="Create a new persona (max 5)">＋
+                            Create</button>
+                    </div>
+                </div>
+                <div id="opPersonaGrid"></div>
+            </div>
+
+            <!-- Quick Persona Creator Modal -->
+            <div id="quickPersonaModal">
+                <div class="qp-modal-inner">
+                    <h3>🎭 Create Quick Persona</h3>
+                    <p id="qpQuota">You can create up to 5 personal personas.</p>
+                    <div class="qp-field"><label>Username</label><input type="text" id="qpUsername"
+                            placeholder="e.g. Sarah"></div>
+                    <div class="qp-field"><label>Gender</label>
+                        <select id="qpGender">
+                            <option value="female">Female</option>
+                            <option value="male">Male</option>
+                        </select>
+                    </div>
+                    <div class="qp-field"><label>Room</label>
+                        <select id="qpRoom">
+                            <option value="lounge-chat">Lounge Chat</option>
+                            <option value="sex-chat">Sex Chat</option>
+                            <option value="roleplay-chat">RolePlay Chat</option>
+                            <option value="bdsm-chat">BDSM Chat</option>
+                            <option value="gay-chat">Gay Chat</option>
+                            <option value="lesbian-chat">Lesbian Chat</option>
+                            <option value="confessions-chat">Confessions</option>
+                            <option value="younger4older-chat">Younger4Older</option>
+                        </select>
+                    </div>
+                    <div class="qp-actions">
+                        <button class="qp-cancel"
+                            onclick="document.getElementById('quickPersonaModal').classList.remove('open')">Cancel</button>
+                        <button class="qp-save" id="btnSaveQuickPersona">Create Persona</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Composer -->
+            <div class="composer-area">
+                <div class="composer-label" id="composerLabel">Lounge</div>
+                <input type="text" class="composer-input" id="messageInput" placeholder="Type to chat" maxlength="500">
+                <div class="composer-actions">
+                    <button class="action-btn" id="uploadMediaBtn" title="Share Image / Video">🖼️</button>
+                    <button class="send-btn" id="sendBtn" title="Send">➤</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar: Users -->
+        <aside class="sidebar sidebar-right" id="sidebar-users">
+            <div class="sidebar-tabs">
+                <button class="tab-btn active" id="tabUsers" onclick="switchTab('users')">Users</button>
+                <button class="tab-btn" id="tabFriends" onclick="switchTab('friends')">Friends</button>
+            </div>
+
+            <div class="users-toolbar">
+                <span class="user-count" id="userCount">0</span>
+                <div class="toolbar-icons">
+                    <button title="Search Users" onclick="toggleUserSearch()">🔍</button>
+                </div>
+            </div>
+
+            <!-- User search (hidden by default) -->
+            <div id="userSearchWrap" style="display:none; padding: 0 10px 6px;">
+                <input type="text" class="user-search" id="userSearchInput" placeholder="Search users...">
+            </div>
+
+            <div class="sidebar-scrollable">
+                <!-- Users Tab -->
+                <ul class="user-list" id="userList"></ul>
+
+                <!-- Friends Tab -->
+                <ul class="user-list" id="friendList" style="display:none;">
+                    <li style="color:#666; font-size:12px; padding:12px; text-align:center;">
+                        Add friends by clicking a user and selecting "Add Friend"
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <span id="ignoreCount" onclick="showIgnoreList()">0 ignores</span>
+            </div>
+        </aside>
+
+        <!-- Overlay for mobile sidebars -->
+        <div class="overlay" id="mobile-overlay"></div>
+    </div>
+
+    <!-- ── Moderation / User Action Modal ── -->
+    <div class="mod-overlay" id="modOverlay">
+        <div class="mod-modal">
+            <button class="mod-close" onclick="closeModModal()">✕</button>
+            <h3>User Options</h3>
+            <div class="mod-avatar-row">
+                <img id="modAvatar" src="" alt="avatar">
+                <div>
+                    <div class="mod-username" id="modUsername"></div>
+                    <div class="mod-gender" id="modGender"></div>
+                </div>
+            </div>
+            <div class="mod-actions">
+                <button class="mod-btn whisper" onclick="doWhisper()"><i class="fa-solid fa-comments"></i> Whisper (Private Message)</button>
+                <button class="mod-btn ignore" onclick="doIgnore()">🚫 Ignore</button>
+                <button class="mod-btn ignore" onclick="doAddFriend()" id="friendBtn">➕ Add Friend</button>
+                <button class="mod-btn report" onclick="doReport()">⚠️ Report</button>
+                <!-- Admin-only section -->
+                <div id="modAdminSection"
+                    style="display:none; border-top: 1px solid #333; padding-top: 8px; margin-top: 4px;">
+                    <div style="font-size:11px; color:#e8760a; margin-bottom:6px;">🛡️ MODERATION</div>
+                    <button class="mod-btn kick" onclick="doKick()">👢 Kick from Room</button>
+                    <button class="mod-btn ban" onclick="doBan()">🔨 Ban User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+    <script>
+        // ════════════════════════════════════════════════════
+        //  AUTH CHECK
+        // ════════════════════════════════════════════════════
+        if (sessionStorage.getItem('isLoggedIn') !== 'true' && !localStorage.getItem('cm_token')) {
+            window.location.href = 'login.html';
+        }
+
+        // ════════════════════════════════════════════════════
+        //  CONFIG
+        // ════════════════════════════════════════════════════
+        const SERVER_URL = 'http://localhost:3000';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmrXdujt1sE-Eeyeuh7k-GuwUGWtxLcNS8GRTHbsB4-hs8YW5FeetrUrGLXEI539ly/exec';
+        const CLOUDINARY_CLOUD = 'tgzv1edu';
+        const CLOUDINARY_KEY = '796394868822991';
+        const CLOUDINARY_SECRET = 's7uxHUsFXVuwrPHr8Y3_UTHd5BQ';
+        let socket;
+
+        // Admin usernames (no "Guest-" prefix) — add yours here
+        const ADMINS = ['zex', 'Admin', 'Moderator'];
+
+        // ════════════════════════════════════════════════════
+        //  SESSION SETUP
+        // ════════════════════════════════════════════════════
+        const urlParams = new URLSearchParams(window.location.search);
+        const room = urlParams.get('room') || localStorage.getItem('cm_room') || 'lounge-chat';
+        
+        // Prevent accessing cam-room through the normal text chat interface
+        if (room === 'cam-room') {
+            window.location.href = 'cam-room.html' + window.location.search;
+        }
+
+        const rawUsername = urlParams.get('username') || localStorage.getItem('cm_username') || 'User';
+        const isGuest = urlParams.get('guest') !== null
+            ? urlParams.get('guest') !== 'false'
+            : localStorage.getItem('cm_isGuest') !== 'false';
+        const displayUsername = isGuest ? (rawUsername.startsWith('Guest-') ? rawUsername : `Guest-${rawUsername}`) : rawUsername;
+        const isAdmin = ADMINS.includes(rawUsername);
+
+        // Save session to localStorage so room switches don't need re-login
+        const userGender = localStorage.getItem('cm_gender') || urlParams.get('gender') || 'unknown';
+        localStorage.setItem('cm_room', room);
+        localStorage.setItem('cm_username', rawUsername);
+        localStorage.setItem('cm_isGuest', isGuest ? 'true' : 'false');
+        if (urlParams.get('gender')) localStorage.setItem('cm_gender', urlParams.get('gender'));
+
+        // ── Room gender restrictions ──
+        const ROOM_RESTRICTIONS = {
+            'lesbian-chat': { allowedGenders: ['female', 'trans'], message: '🚫 The Lesbian Chat room is for women and transgender users only. You are not eligible to enter.' },
+            'gay-chat': { allowedGenders: ['male', 'trans'], message: '🚫 The Gay Chat room is for men and transgender users only. You are not eligible to enter.' },
+        };
+
+        // ── Room Switch (no re-login needed) ──
+        function switchRoom(targetRoom) {
+            const restriction = ROOM_RESTRICTIONS[targetRoom];
+            if (restriction && !restriction.allowedGenders.includes(userGender)) {
+                // Show inline error modal
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:99999;display:flex;align-items:center;justify-content:center;';
+                overlay.innerHTML = `
+                    <div style="background:#1a1a1a;border:2px solid #e8760a;border-radius:16px;padding:32px;max-width:400px;text-align:center;">
+                        <div style="font-size:48px;margin-bottom:16px;">🚫</div>
+                        <h3 style="color:#e8760a;margin-bottom:12px;">Access Restricted</h3>
+                        <p style="color:#ccc;margin-bottom:24px;">${restriction.message}</p>
+                        <button onclick="this.closest('[style*=position]').remove()" style="background:#e8760a;color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:15px;cursor:pointer;">Got it</button>
+                    </div>`;
+                document.body.appendChild(overlay);
+                return;
+            }
+            window.location.href = `chat.html?room=${encodeURIComponent(targetRoom)}&username=${encodeURIComponent(rawUsername)}&guest=${isGuest}&gender=${encodeURIComponent(userGender)}`;
+        }
+
+        function formatRoomName(slug) {
+            return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+        const roomName = formatRoomName(room);
+
+        // Ignore & friends lists (localStorage)
+        let ignoreList = JSON.parse(localStorage.getItem('ignoreList') || '[]');
+        let friendsList = JSON.parse(localStorage.getItem('friendsList') || '[]');
+        let selectedUser = null;
+
+        // ── Bot data (populated by bot-manager.html via localStorage) ──
+        // Uses per-room bot map: caughtme_room_bots = { 'lounge-chat': [...], 'sex-chat': [...] }
+        const roomBotMap = JSON.parse(localStorage.getItem('caughtme_room_bots') || '{}');
+        let botGenders = JSON.parse(localStorage.getItem('caughtme_bot_genders') || '{}');
+        setInterval(() => {
+            botGenders = JSON.parse(localStorage.getItem('caughtme_bot_genders') || '{}');
+        }, 10000);
+
+        function getBotAvatarClass(username) {
+            if (!botGenders[username]) return '';
+            return botGenders[username] === 'female' ? 'bot-female' : 'bot-male';
+        }
+
+        // ── Merge bot users into a server-returned user list ──
+        function mergeBotUsers(serverUsers) {
+            // Try room-specific bots first, then fall back to global bot list
+            const roomBotMap = JSON.parse(localStorage.getItem('caughtme_room_bots') || '{}');
+            let botsData = roomBotMap[room] || JSON.parse(localStorage.getItem('caughtme_bots') || 'null');
+
+            if (!botsData) {
+                botsData = [
+                    { id: 1, username: 'Jessica_xo', gender: 'female' },
+                    { id: 2, username: 'Mike_Fitness', gender: 'male' }
+                ];
+                localStorage.setItem('caughtme_bots', JSON.stringify(botsData));
+                const genderMap = {};
+                botsData.forEach(b => genderMap[b.username] = b.gender);
+                localStorage.setItem('caughtme_bot_genders', JSON.stringify(genderMap));
+            }
+
+            const serverNames = serverUsers.map(u => u.username);
+            const botUsers = botsData
+                .filter(b => !serverNames.includes(b.username))
+                .map(b => ({ username: b.username, gender: b.gender }));
+
+            return [...botUsers, ...serverUsers];
+        }
+
+        // ── Update static UI ──
+        document.getElementById('activeRoomTab').textContent = roomName;
+        document.getElementById('composerLabel').textContent = roomName;
+        document.getElementById('topbarUsername').textContent = displayUsername;
+        document.getElementById('topbarAvatar').textContent = rawUsername.charAt(0).toUpperCase();
+        document.getElementById('warningUsername').textContent = `(${displayUsername})`;
+        document.getElementById('warningTime').textContent = new Date().toLocaleTimeString();
+        document.title = `Caught Me | ${roomName}`;
+
+        // Highlight active room in left sidebar
+        document.querySelectorAll('#roomListSidebar a').forEach(a => {
+            if (a.href.includes(room.replace('-chat', '') + '-chat') ||
+                a.href.includes('lounge') && room === 'lounge-chat') {
+                a.parentElement.classList.add('active');
+            }
+        });
+
+        // ════════════════════════════════════════════════════
+        //  SIDEBAR TOGGLES
+        // ════════════════════════════════════════════════════
+        const btnRooms = document.getElementById('btn-rooms');
+        const btnUsersMobile = document.getElementById('btn-users-mobile');
+        const sidebarLeft = document.getElementById('sidebar-rooms');
+        const sidebarRight = document.getElementById('sidebar-users');
+        const overlay = document.getElementById('mobileOverlay');
+
+        btnRooms.addEventListener('click', () => {
+            sidebarLeft.classList.toggle('active');
+            if (window.innerWidth <= 900) overlay.classList.add('active');
+        });
+
+        if (btnUsersMobile) {
+            btnUsersMobile.addEventListener('click', () => {
+                sidebarRight.classList.toggle('active');
+                if (window.innerWidth <= 900) overlay.classList.add('active');
+            });
+        }
+
+        overlay.addEventListener('click', () => {
+            sidebarLeft.classList.remove('active');
+            sidebarRight.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // ════════════════════════════════════════════════════
+        //  TABS: Users / Friends
+        // ════════════════════════════════════════════════════
+        function switchTab(tab) {
+            document.getElementById('tabUsers').classList.toggle('active', tab === 'users');
+            document.getElementById('tabFriends').classList.toggle('active', tab === 'friends');
+            document.getElementById('userList').style.display = tab === 'users' ? '' : 'none';
+            document.getElementById('friendList').style.display = tab === 'friends' ? '' : 'none';
+            if (tab === 'friends') renderFriends();
+        }
+
+        // ════════════════════════════════════════════════════
+        //  USER SEARCH
+        // ════════════════════════════════════════════════════
+        function toggleUserSearch() {
+            const wrap = document.getElementById('userSearchWrap');
+            const open = wrap.style.display === 'none';
+            wrap.style.display = open ? 'block' : 'none';
+            if (open) document.getElementById('userSearchInput').focus();
+        }
+        document.getElementById('userSearchInput').addEventListener('input', function () {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('#userList li').forEach(li => {
+                const name = li.querySelector('.user-name')?.textContent.toLowerCase() || '';
+                li.style.display = name.includes(q) ? '' : 'none';
+            });
+        });
+
+        // ════════════════════════════════════════════════════
+        //  MESSAGES
+        // ════════════════════════════════════════════════════
+        const msgsContainer = document.getElementById('messages-container');
+        const scrollBtn = document.getElementById('scrollBottomBtn');
+        let lastMessageCount = 0;
+
+        msgsContainer.addEventListener('scroll', () => {
+            const nearBottom = msgsContainer.scrollHeight - msgsContainer.scrollTop - msgsContainer.clientHeight < 150;
+            scrollBtn.style.display = nearBottom ? 'none' : 'flex';
+        });
+        scrollBtn.addEventListener('click', () => {
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+            scrollBtn.style.display = 'none';
+        });
+
+        function getMediaType(url) {
+            if (!url) return null;
+            if (url.includes('/video/upload/')) return 'video';
+            return 'image';
+        }
+
+        function appendMessage(msg) {
+            if (ignoreList.includes(msg.username)) return;
+            const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            let displayMsg = msg.content || msg.message || '';
+            let parsedMediaUrl = msg.mediaUrl || msg.media_url || '';
+
+            const mediaMatch = displayMsg.match(/\[MEDIA:(.*?)\]/);
+            if (mediaMatch) {
+                parsedMediaUrl = mediaMatch[1];
+                displayMsg = displayMsg.replace(mediaMatch[0], '').trim();
+            }
+
+            let mediaHtml = '';
+            if (parsedMediaUrl) {
+                if (getMediaType(parsedMediaUrl) === 'video') {
+                    mediaHtml = '<br><div style="margin-top:6px;"><video controls style="max-width:300px;border-radius:8px;background:#000;"><source src="' + parsedMediaUrl + '" type="video/mp4">Unsupported.</video></div>';
+                } else {
+                    mediaHtml = '<br><div style="margin-top:6px;"><a href="' + parsedMediaUrl + '" target="_blank"><img src="' + parsedMediaUrl + '" alt="Shared image" style="max-width:300px;border-radius:8px;cursor:pointer;border:2px solid #444;display:block;" loading="lazy"></a></div>';
+                }
+            }
+
+            const isGuest_ = msg.username.startsWith('Guest-');
+            const color = isGuest_ ? 'user-pink' : 'user-blue';
+            const botClass = getBotAvatarClass(msg.username);
+            const isMine = msg.username === displayUsername;
+            const msgUid = 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+
+            const deleteHtml = isMine
+                ? '<span class="own-delete-btn" title="Delete message" onclick="deleteOwnMsg(\'' + msgUid + '\')">&#128465;&#65039;</span>'
+                : (isAdmin ? '<span class="mod-delete" style="cursor:pointer;color:#ff4444;font-size:11px;margin-left:8px;" onclick="deleteOwnMsg(\'' + msgUid + '\')">&#x2715; del</span>' : '');
+
+            const html = '<div class="message-group" data-user="' + msg.username + '" id="' + msgUid + '">'
+                + '<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(msg.username) + '" class="avatar ' + botClass + '" alt="avatar" onclick="openUserModal(\'' + msg.username + '\',\'' + (isGuest_ ? 'Guest' : 'Member') + '\')">'
+                + '<div class="message-content">'
+                + '<span class="username ' + color + '" style="cursor:pointer;" onclick="openUserModal(\'' + msg.username + '\',\'' + (isGuest_ ? 'Guest' : 'Member') + '\')">' + msg.username + ':</span> '
+                + displayMsg
+                + mediaHtml
+                + '<span class="timestamp">' + time + '</span>'
+                + deleteHtml
+                + '</div></div>';
+
+            const nearBottom = msgsContainer.scrollHeight - msgsContainer.scrollTop - msgsContainer.clientHeight < 200;
+            msgsContainer.insertAdjacentHTML('beforeend', html);
+            if (nearBottom) msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        function deleteOwnMsg(msgUid) {
+            const el = document.getElementById(msgUid);
+            if (el) {
+                el.style.transition = 'opacity 0.25s';
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 260);
+            }
+        }
+
+        function appendSystemMessage(text) {
+            const html = `
+                <div class="message-group system-join">
+                    <span class="icon">ℹ️</span>
+                    <div class="message-content">${text} <span class="timestamp">${new Date().toLocaleTimeString()}</span></div>
+                </div>`;
+            msgsContainer.insertAdjacentHTML('beforeend', html);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // ══════════════════════════════════════════════════
+        //  WEBSOCKET — connect immediately on page load
+        // ══════════════════════════════════════════════════
+        function connectSocket() {
+            socket = io(SERVER_URL, { transports: ['websocket', 'polling'] });
+
+            socket.on('connect', () => {
+                console.log('[WS] Connected:', socket.id);
+                socket.emit('join_room', { room, username: displayUsername, isGuest });
+            });
+
+            socket.on('new_message', (msg) => {
+                appendMessage(msg);
+                if (msg.username !== displayUsername) {
+                    window.playChatSound && window.playChatSound();
+                }
+            });
+
+            socket.on('connect_error', (err) => {
+                console.warn('[WS] Connection error:', err.message);
+            });
+        }
+        connectSocket(); // ← Connect immediately, not after fetch
+
+        function fetchMessages() {
+            fetch(`${SERVER_URL}/api/chat/messages?room=${encodeURIComponent(room)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (!Array.isArray(data)) return;
+                    data.forEach(msg => appendMessage(msg));
+                    msgsContainer.scrollTop = msgsContainer.scrollHeight;
+                })
+                .catch(err => console.warn('Fetch messages error:', err));
+        }
+
+        // ══════════════════════════════════════════════════
+        //  OPERATOR PANEL — advanced version
+        // ══════════════════════════════════════════════════
+        let operatorPersonas = [];
+        let personaCount = 0;
+
+        function renderPersonaGrid() {
+            const grid = document.getElementById('opPersonaGrid');
+            const select = document.getElementById('personaSelect');
+            // Rebuild select options
+            select.innerHTML = '<option value="">👤 Send as myself</option>';
+            grid.innerHTML = '';
+
+            operatorPersonas.forEach(p => {
+                // Add to select dropdown
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.username} · ${p.room_slug}`;
+                select.appendChild(opt);
+
+                // Add persona card
+                const card = document.createElement('div');
+                card.className = 'op-persona-card';
+                card.dataset.id = p.id;
+                card.innerHTML = `
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.username)}" alt="">
+                    <div>
+                        <div class="op-card-name">${p.username}</div>
+                        <div class="op-card-room">${p.room_slug}</div>
+                    </div>`;
+                card.addEventListener('click', () => {
+                    select.value = p.id;
+                    select.dispatchEvent(new Event('change'));
+                    document.querySelectorAll('.op-persona-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                });
+                grid.appendChild(card);
+            });
+
+            // Add "+ new" card if under quota
+            if (personaCount < 5) {
+                const addCard = document.createElement('div');
+                addCard.className = 'op-add-card';
+                addCard.innerHTML = `<span style="font-size:18px;">＋</span><span>New persona (${personaCount}/5)</span>`;
+                addCard.onclick = () => openQuickPersonaModal();
+                grid.appendChild(addCard);
+            }
+        }
+
+        function setupOperatorPanel() {
+            const token = localStorage.getItem('cm_token');
+            if (!token) return;
+
+            fetch(`${SERVER_URL}/api/operator/personas`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+                .then(r => r.json())
+                .then(personas => {
+                    if (!Array.isArray(personas)) return;
+                    operatorPersonas = personas;
+                    personaCount = personas.length;
+
+                    if (personas.length >= 0) {
+                        // Show panel even if 0 personas — operators can create
+                        const jwt_payload = JSON.parse(atob(token.split('.')[1]));
+                        if (jwt_payload.role === 'PERSONA_OPERATOR' || jwt_payload.role === 'OWNER') {
+                            document.getElementById('operatorPanel').style.display = 'flex';
+                            renderPersonaGrid();
+                        }
+                    }
+
+                    // Persona select change → update avatar + disclosure
+                    document.getElementById('personaSelect').addEventListener('change', (e) => {
+                        const pid = parseInt(e.target.value);
+                        const p = operatorPersonas.find(x => x.id === pid);
+                        const disclosure = document.getElementById('personaDisclosure');
+                        const avatar = document.getElementById('opCurrentAvatar');
+                        if (p) {
+                            disclosure.style.display = 'inline-block';
+                            avatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.username)}`;
+                            document.querySelectorAll('.op-persona-card').forEach(c => {
+                                c.classList.toggle('selected', parseInt(c.dataset.id) === pid);
+                            });
+                        } else {
+                            disclosure.style.display = 'none';
+                            avatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(rawUsername)}`;
+                            document.querySelectorAll('.op-persona-card').forEach(c => c.classList.remove('selected'));
+                        }
+                    });
+
+                    // Toggle persona grid
+                    document.getElementById('btnTogglePersonaGrid').addEventListener('click', () => {
+                        const grid = document.getElementById('opPersonaGrid');
+                        const isOpen = grid.style.display === 'flex';
+                        grid.style.display = isOpen ? 'none' : 'flex';
+                        document.getElementById('btnTogglePersonaGrid').classList.toggle('active', !isOpen);
+                    });
+
+                    // Create quick persona button
+                    document.getElementById('btnCreateQuickPersona').addEventListener('click', openQuickPersonaModal);
+
+                    // Save quick persona
+                    document.getElementById('btnSaveQuickPersona').addEventListener('click', saveQuickPersona);
+                })
+                .catch(err => console.warn('Operator panel error:', err));
+        }
+
+        function openQuickPersonaModal() {
+            if (personaCount >= 5) {
+                appendSystemMessage('⚠️ You have reached the maximum of 5 personas.');
+                return;
+            }
+            document.getElementById('qpQuota').textContent = `You can create ${5 - personaCount} more persona(s). (${personaCount}/5 used)`;
+            // Pre-select current room
+            const roomSelect = document.getElementById('qpRoom');
+            if (roomSelect) { for (let opt of roomSelect.options) { if (opt.value === room) { opt.selected = true; break; } } }
+            document.getElementById('quickPersonaModal').classList.add('open');
+        }
+
+        function saveQuickPersona() {
+            const token = localStorage.getItem('cm_token');
+            if (!token) return;
+            const username = document.getElementById('qpUsername').value.trim();
+            const gender = document.getElementById('qpGender').value;
+            const room_slug = document.getElementById('qpRoom').value;
+            if (!username) { alert('Enter a username'); return; }
+
+            const btn = document.getElementById('btnSaveQuickPersona');
+            btn.textContent = 'Creating...';
+            btn.disabled = true;
+
+            fetch(`${SERVER_URL}/api/operator/quick-persona`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ username, gender, room_slug })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    btn.textContent = 'Create Persona'; btn.disabled = false;
+                    if (data.error) { alert(data.error); return; }
+                    document.getElementById('quickPersonaModal').classList.remove('open');
+                    document.getElementById('qpUsername').value = '';
+                    // Refresh persona list
+                    operatorPersonas.push({ id: data.id, username, gender, room_slug });
+                    personaCount++;
+                    renderPersonaGrid();
+                    appendSystemMessage(`✅ Persona <strong>${username}</strong> created! Select it from the dropdown to chat as them.`);
+                })
+                .catch(() => { btn.textContent = 'Create Persona'; btn.disabled = false; alert('Server error'); });
+        }
+
+        // ── Send message ──
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function sendMessage(text, mediaUrl = '') {
+            if (!text.trim() && !mediaUrl) return;
+
+            const asPersonaId = document.getElementById('personaSelect')?.value || '';
+            const token = localStorage.getItem('cm_token');
+
+            // Get active persona name if any, otherwise displayUsername
+            let activeName = displayUsername;
+            if (asPersonaId && typeof operatorPersonas !== 'undefined') {
+                const p = operatorPersonas.find(x => x.id === parseInt(asPersonaId));
+                if (p) activeName = p.username;
+            }
+
+            let sentMessage = text;
+            if (mediaUrl) {
+                sentMessage = `${text} [MEDIA:${mediaUrl}]`;
+            }
+
+            if (!socket) {
+                connectSocket();
+            }
+
+            const data = {
+                room,
+                username: displayUsername,
+                content: text,
+                mediaUrl: mediaUrl || '',
+                asPersonaId: asPersonaId ? parseInt(asPersonaId) : null,
+                token: token || null
+            };
+
+            socket.emit('send_message', data, (res) => {
+                if (res && res.error) appendSystemMessage('❌ ' + res.error);
+            });
+        }
+
+        sendBtn.addEventListener('click', () => { const t = messageInput.value.trim(); if (t) { sendMessage(t); messageInput.value = ''; } });
+        messageInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendBtn.click(); });
+
+        // ── Admin: delete message ──
+        function deleteMsg(messageID, el) {
+            if (!messageID || messageID.startsWith('local-')) { el.closest('.message-group').remove(); return; }
+            fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'deleteMessage', messageID })
+            });
+            el.closest('.message-group').remove();
+        }
+
+        // ════════════════════════════════════════════════════
+        //  LIVE USER LIST
+        // ════════════════════════════════════════════════════
+        function renderUserList(users) {
+            const ul = document.getElementById('userList');
+            const count = document.getElementById('userCount');
+            count.textContent = users.length;
+            ul.innerHTML = '';
+
+            users.forEach(u => {
+                if (ignoreList.includes(u.username)) return;
+                const isG = u.username.startsWith('Guest-');
+                const isFriend = friendsList.includes(u.username);
+                const isAdm = ADMINS.includes(u.username.replace('Guest-', ''));
+                const isSelf = u.username === displayUsername;
+                const botClass = getBotAvatarClass(u.username);
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="user-info" onclick="${isSelf ? '' : `openUserModal('${u.username}','${u.gender || (isG ? 'Guest' : 'Member')}')`}" style="${isSelf ? '' : 'cursor:pointer;'}">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.username)}" class="list-avatar ${botClass}" alt="avatar">
+                        <span class="user-name">
+                            ${u.username}
+                            ${isAdm ? '<span class="mod-badge">MOD</span>' : ''}
+                            ${isFriend ? '<span class="friend-tag">Friend</span>' : ''}
+                            ${isSelf ? ' <span style="color:#888;font-size:10px;">(you)</span>' : ''}
+                        </span>
+                    </div>
+                    ${!isSelf ? `
+                    <div class="user-actions">
+                        <span title="Private Message" onclick="openWhisper('${u.username}')"><i class="fa-solid fa-comments"></i></span>
+                    </div>` : ''}
+                `;
+                ul.appendChild(li);
+            });
+
+            if (ul.children.length === 0) {
+                ul.innerHTML = '<li style="color:#666;font-size:12px;padding:12px;text-align:center;">No users found</li>';
+            }
+        }
+
+        function fetchUsers() {
+            fetch(`${SCRIPT_URL}?action=getUsers&room=${encodeURIComponent(room)}`)
+                .then(r => r.json())
+                .then(users => {
+                    if (Array.isArray(users)) renderUserList(mergeBotUsers(users));
+                })
+                .catch(() => {
+                    // On network failure, still show bots if engine is running
+                    renderUserList(mergeBotUsers([]));
+                });
+        }
+
+        function renderFriends() {
+            const fl = document.getElementById('friendList');
+            fl.innerHTML = '';
+            if (friendsList.length === 0) {
+                fl.innerHTML = '<li style="color:#666;font-size:12px;padding:12px;text-align:center;">No friends yet. Add friends from the Users list.</li>';
+                return;
+            }
+            friendsList.forEach(name => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="user-info" onclick="openUserModal('${name}','Friend')" style="cursor:pointer;">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}" class="list-avatar">
+                        <span class="user-name">${name}</span>
+                    </div>
+                    <div class="user-actions">
+                        <span title="Remove" onclick="removeFriend('${name}')" style="cursor:pointer;">❌</span>
+                    </div>`;
+                fl.appendChild(li);
+            });
+        }
+
+        function removeFriend(name) {
+            friendsList = friendsList.filter(f => f !== name);
+            localStorage.setItem('friendsList', JSON.stringify(friendsList));
+            renderFriends();
+        }
+
+        // ════════════════════════════════════════════════════
+        //  MODERATION MODAL
+        // ════════════════════════════════════════════════════
+        function openUserModal(username, gender) {
+            selectedUser = { username, gender };
+            document.getElementById('modUsername').textContent = username;
+            document.getElementById('modGender').textContent = gender || '';
+            document.getElementById('modAvatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}`;
+            document.getElementById('modAdminSection').style.display = isAdmin ? 'block' : 'none';
+
+            const isFriend = friendsList.includes(username);
+            document.getElementById('friendBtn').textContent = isFriend ? '✓ Friends' : '➕ Add Friend';
+            document.getElementById('modOverlay').classList.add('active');
+        }
+
+        function closeModModal() {
+            document.getElementById('modOverlay').classList.remove('active');
+            selectedUser = null;
+        }
+        document.getElementById('modOverlay').addEventListener('click', function (e) {
+            if (e.target === this) closeModModal();
+        });
+
+        function openWhisper(username) {
+            openUserModal(username, '');
+            doWhisper();
+        }
+
+        function doWhisper() {
+            if (!selectedUser) return;
+            closeModModal();
+            messageInput.value = `/w ${selectedUser.username} `;
+            messageInput.focus();
+            appendSystemMessage(`Whispering to <strong>${selectedUser.username}</strong>... (type after the /w command)`);
+            window.playDMSound && window.playDMSound();
+        }
+
+        function doIgnore() {
+            if (!selectedUser) return;
+            const name = selectedUser.username;
+            if (!ignoreList.includes(name)) {
+                ignoreList.push(name);
+                localStorage.setItem('ignoreList', JSON.stringify(ignoreList));
+            }
+            document.getElementById('ignoreCount').textContent = `${ignoreList.length} ignore${ignoreList.length !== 1 ? 's' : ''}`;
+            appendSystemMessage(`You are now ignoring <strong>${name}</strong>.`);
+            // Remove their messages from view
+            document.querySelectorAll(`.message-group[data-user="${name}"]`).forEach(el => el.remove());
+            closeModModal();
+        }
+
+        function doAddFriend() {
+            if (!selectedUser) return;
+            const name = selectedUser.username;
+            if (!friendsList.includes(name)) {
+                friendsList.push(name);
+                localStorage.setItem('friendsList', JSON.stringify(friendsList));
+                appendSystemMessage(`<strong>${name}</strong> added to your friends list! 🎉`);
+                document.getElementById('friendBtn').textContent = '✓ Friends';
+            } else {
+                removeFriend(name);
+                appendSystemMessage(`<strong>${name}</strong> removed from your friends list.`);
+                document.getElementById('friendBtn').textContent = '➕ Add Friend';
+            }
+        }
+
+        function doReport() {
+            if (!selectedUser) return;
+            const name = selectedUser.username;
+            fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'report', reporter: displayUsername, reported: name, room })
+            });
+            appendSystemMessage(`✅ Report submitted for <strong>${name}</strong>. Our moderators will review it.`);
+            closeModModal();
+        }
+
+        // ── Admin Actions ──
+        function doKick() {
+            if (!selectedUser || !isAdmin) return;
+            const name = selectedUser.username;
+            fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'chat', room, username: '🛡️ SYSTEM', message: `⚠️ ${name} has been kicked from the room by a moderator.`, mediaUrl: '' })
+            });
+            appendSystemMessage(`👢 <strong>${name}</strong> was kicked from the room.`);
+            closeModModal();
+        }
+
+        function doBan() {
+            if (!selectedUser || !isAdmin) return;
+            const name = selectedUser.username;
+            fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'blockUser', username: name })
+            });
+            fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'chat', room, username: '🛡️ SYSTEM', message: `🔨 ${name} has been banned by a moderator.`, mediaUrl: '' })
+            });
+            appendSystemMessage(`🔨 <strong>${name}</strong> has been banned.`);
+            closeModModal();
+        }
+
+        function showIgnoreList() {
+            if (ignoreList.length === 0) { alert('You have no ignored users.'); return; }
+            const list = ignoreList.join(', ');
+            if (confirm(`Ignored users:\n${list}\n\nClick OK to clear all ignores.`)) {
+                ignoreList = [];
+                localStorage.setItem('ignoreList', JSON.stringify(ignoreList));
+                document.getElementById('ignoreCount').textContent = '0 ignores';
+                appendSystemMessage('Ignore list cleared.');
+            }
+        }
+
+        // ════════════════════════════════════════════════════
+        //  CLOUDINARY UPLOAD WIDGET
+        // ════════════════════════════════════════════════════
+        function signCloudinary(paramsToSign) {
+            const str = Object.keys(paramsToSign).sort().map(k => `${k}=${paramsToSign[k]}`).join('&') + CLOUDINARY_SECRET;
+            return CryptoJS.SHA1(str).toString();
+        }
+
+        function makeWidget(resourceType) {
+            const typeLabel = resourceType === 'video' ? 'videos' : 'images';
+            const folder = `txt room website/${room}/${typeLabel}`;
+            return cloudinary.createUploadWidget({
+                cloudName: CLOUDINARY_CLOUD, apiKey: CLOUDINARY_KEY,
+                resourceType, folder, multiple: false,
+                maxFileSize: resourceType === 'video' ? 50000000 : 10000000,
+                clientAllowedFormats: resourceType === 'video'
+                    ? ['mp4', 'mov', 'avi', 'webm', 'mkv']
+                    : ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'],
+                uploadSignature: (arg1, arg2) => {
+                    const cb = typeof arg1 === 'function' ? arg1 : arg2;
+                    const pts = typeof arg1 === 'object' ? arg1 : arg2;
+                    try {
+                        cb(signCloudinary(pts));
+                    } catch (e) {
+                        console.error('Upload signature error:', e);
+                        cb('');
+                    }
+                },
+                styles: { palette: { window: '#1a1a1a', windowBorder: '#333', tabIcon: '#e8760a', menuIcons: '#ccc', textDark: '#ffffff', textLight: '#999', link: '#e8760a', action: '#e8760a', error: '#ff4444', inProgress: '#e8760a', complete: '#28a745', sourceBg: '#0f0f0f' } }
+            }, (error, result) => {
+                if (error) { console.error('Cloudinary error:', error); return; }
+                if (result && result.event === 'success') {
+                    const info = result.info;
+                    const label = info.resource_type === 'video' ? '<i class="fa-solid fa-video"></i> Shared a video' : '🖼️ Shared an image';
+                    sendMessage(label, info.secure_url);
+                    fetch(SCRIPT_URL, {
+                        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'media', username: displayUsername, room, cloudinaryUrl: info.secure_url, fileType: info.resource_type, fileSizeMB: (info.bytes / 1048576).toFixed(2) })
+                    });
+                }
+            });
+        }
+
+        const imageWidget = makeWidget('image');
+        const videoWidget = makeWidget('video');
+
+        document.getElementById('uploadMediaBtn').addEventListener('click', () => {
+            const existing = document.getElementById('mediaPicker');
+            if (existing) { existing.remove(); return; }
+            const picker = document.createElement('div');
+            picker.id = 'mediaPicker';
+            picker.style.cssText = 'position:absolute;bottom:60px;right:60px;background:#2a2a2a;border:1px solid #444;border-radius:10px;padding:10px;display:flex;gap:10px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+            picker.innerHTML = `
+                <button id="pickImage" style="background:#e8760a;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px;">🖼️ Image</button>
+                <button id="pickVideo" style="background:#333;color:#fff;border:1px solid #555;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px;"><i class="fa-solid fa-video"></i> Video</button>`;
+            document.querySelector('.composer-area').style.position = 'relative';
+            document.querySelector('.composer-area').appendChild(picker);
+            document.getElementById('pickImage').onclick = () => { picker.remove(); imageWidget.open(); };
+            document.getElementById('pickVideo').onclick = () => { picker.remove(); videoWidget.open(); };
+            setTimeout(() => {
+                document.addEventListener('click', function closePicker(evt) {
+                    if (!picker.contains(evt.target) && evt.target.id !== 'uploadMediaBtn') picker.remove();
+                    document.removeEventListener('click', closePicker);
+                });
+            }, 100);
+        });
+
+        // ════════════════════════════════════════════════════
+        //  INIT — start polling
+        // ════════════════════════════════════════════════════
+        fetchMessages();
+        setupOperatorPanel();
+        fetchUsers();
+        // setInterval(fetchMessages, 3000); // Replaced by Socket.io
+        setInterval(fetchUsers, 10000); // refresh user list every 10s
+
+        // Update ignore count display on load
+        document.getElementById('ignoreCount').textContent = `${ignoreList.length} ignore${ignoreList.length !== 1 ? 's' : ''}`;
+
+        // ════════════════════════════════════════════════════
+        //  USER DROPDOWN MENU
+        // ════════════════════════════════════════════════════
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+
+        userMenuBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', function (e) {
+            if (!userMenuBtn.contains(e.target)) userDropdown.classList.remove('open');
+        });
+
+        // ── Guest vs Member menu visibility ──
+        if (isGuest) {
+            // Guest: show "Create an account" + "Login", hide nothing
+            document.getElementById('ddCreateAccount').style.display = '';
+            document.getElementById('ddLogin').style.display = '';
+        } else {
+            // Member: hide both guest-only items
+            document.getElementById('ddCreateAccount').style.display = 'none';
+            document.getElementById('ddLogin').style.display = 'none';
+        }
+
+        // ── Light / Dark Mode ──
+        const lightToggle = document.getElementById('toggleLightMode');
+        // Restore saved preference
+        if (localStorage.getItem('caughtme_lightmode') === 'true') {
+            document.body.classList.add('light-mode');
+            lightToggle.classList.add('on');
+        }
+        lightToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isLight = lightToggle.classList.toggle('on');
+            document.body.classList.toggle('light-mode', isLight);
+            localStorage.setItem('caughtme_lightmode', isLight);
+        });
+
+        // ── Sounds On/Off ──
+        const soundToggle = document.getElementById('toggleSoundsOn');
+        let soundsEnabled = localStorage.getItem('caughtme_sounds') !== 'false'; // default ON
+        if (!soundsEnabled) soundToggle.classList.remove('on');
+        soundToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            soundsEnabled = soundToggle.classList.toggle('on');
+            localStorage.setItem('caughtme_sounds', soundsEnabled);
+        });
+
+        // Sound player using Web Audio API (no external file needed)
+        function playBeep(freq = 520, duration = 120, vol = 0.3) {
+            if (!soundsEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(vol, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration / 1000);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + duration / 1000);
+            } catch (e) { }
+        }
+        // Expose so fetchMessages and whisper DMs can call it
+        window.playChatSound = () => playBeep(520, 120, 0.25);
+        window.playDMSound = () => playBeep(880, 200, 0.4);
+
+        // ── Publish Cam toggle ──
+        const camToggle = document.getElementById('togglePublishCam');
+        camToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isCamOn = camToggle.classList.toggle('on');
+            if (isCamOn) {
+                // Navigate to cam room in a new tab
+                window.open('login.html?room=cam-room', '_blank');
+            }
+        });
+
+        // ── Accept Calls toggle (just visual for now) ──
+        document.getElementById('toggleAcceptCalls').addEventListener('click', function (e) {
+            e.stopPropagation();
+            this.classList.toggle('on');
+        });
+
+        document.getElementById('ddLogout').addEventListener('click', () => {
+            sessionStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('cm_token');
+            localStorage.removeItem('cm_username');
+            window.location.href = 'index.html';
+        });
+        document.getElementById('ddLogin').addEventListener('click', () => {
+            window.location.href = 'login.html?room=' + encodeURIComponent(room);
+        });
+        document.getElementById('ddCreateAccount').addEventListener('click', () => {
+            window.location.href = 'register.html?room=' + encodeURIComponent(room);
+        });
+        // ── Autostart Bot Engine for Admins ──
+        if (isAdmin) {
+            document.getElementById('btnAdminPanel').style.display = 'inline-block';
+
+            document.getElementById('btnAdminPanel').addEventListener('click', () => {
+                // Open owner-panel (which now contains the bot manager) with autostart and current room selected
+                window.open(`owner-panel.html?room=${encodeURIComponent(room)}&autostart=true`, '_blank');
+            });
+        }
+    </script>
+    <script src="common.js"></script>
+</body>
+
+</html>

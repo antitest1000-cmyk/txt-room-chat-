@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Editor | Caught Me</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="owner-panel.css">
+    <style>
+        :root {
+            --color-orange: #e8760a;
+            --color-orange-hover: #f26e22;
+            --color-dark: #222325;
+            --color-panel: #2b2c2e;
+            --color-input: #1a1b1d;
+            --color-border: #444;
+            --color-text-main: #ffffff;
+            --color-text-muted: #cccccc;
+            --font-normal: 'Open Sans', Arial, sans-serif;
+            --danger: #dc3545;
+            --success: #28a745;
+        }
+
+        body {
+            background-color: var(--color-dark);
+            font-family: var(--font-normal);
+            margin: 0;
+            padding: 40px 20px;
+            color: var(--color-text-main);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0 auto;
+            background-color: transparent;
+            padding: 0;
+        }
+
+        .panel-container {
+            border: 1px solid var(--color-orange);
+            border-radius: 8px;
+            background-color: transparent;
+            position: relative;
+            padding-top: 20px;
+            margin-top: 40px;
+        }
+
+        .panel-tab {
+            position: absolute;
+            top: -1px;
+            left: 20px;
+            background-color: var(--color-orange);
+            color: white;
+            padding: 8px 20px;
+            font-weight: bold;
+            border-radius: 4px 4px 0 0;
+            transform: translateY(-100%);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-content {
+            padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: var(--color-panel);
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid var(--color-border);
+        }
+
+        .controls label {
+            color: var(--color-text-main);
+            font-size: 14px;
+        }
+
+        select {
+            padding: 10px;
+            background-color: var(--color-input);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: var(--color-orange);
+        }
+
+        .btn-nav {
+            background: linear-gradient(to bottom, #666, #444);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            border: 1px solid #333;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .btn-nav:hover {
+            filter: brightness(1.2);
+        }
+
+        /* Modern Table Design */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            background-color: var(--color-panel);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        th {
+            background-color: #1a1b1d;
+            font-weight: 600;
+            color: var(--color-orange);
+            text-transform: uppercase;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #333;
+        }
+
+        td {
+            color: var(--color-text-muted);
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        button.action-btn {
+            padding: 6px 12px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-weight: bold;
+        }
+
+        .btn-edit { background: linear-gradient(to bottom, #555, #333); color: #ccc; }
+        .btn-edit:hover { filter: brightness(1.2); }
+
+        .btn-save { background: linear-gradient(to bottom, #28a745, #1e7e34); color: white; display: none; }
+        .btn-save:hover { filter: brightness(1.2); }
+
+        .btn-cancel { background: linear-gradient(to bottom, #6c757d, #5a6268); color: white; display: none; }
+        .btn-cancel:hover { filter: brightness(1.2); }
+
+        .btn-delete { background: linear-gradient(to bottom, #dc3545, #bd2130); color: white; }
+        .btn-delete:hover { filter: brightness(1.2); }
+
+        /* Editing State */
+        .editable-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            background-color: var(--color-input);
+            border: 1px solid var(--color-orange);
+            border-radius: 4px;
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .toast {
+            min-width: 250px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast-success { background-color: var(--success); border: 1px solid #1e7e34; }
+        .toast-error { background-color: var(--danger); border: 1px solid #bd2130; }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-muted);
+        }
+        .empty-state i {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: var(--color-orange);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+<div class="panel-container">
+    <div class="panel-tab" id="roomNameTab"><i class="fa-solid fa-database"></i> Database Editor</div>
+
+    <div class="panel-content">
+        <div class="controls">
+            <label for="tableSelect"><i class="fa-solid fa-table-list"></i> Select Table:</label>
+            <select id="tableSelect">
+                <option value="">-- Select a Dataset --</option>
+            </select>
+            <button class="btn-nav" onclick="window.location.href='index.html'">
+                <i class="fa-solid fa-house"></i> Back to Home
+            </button>
+        </div>
+
+        <div class="table-wrapper">
+        <table id="dataTable">
+            <thead>
+                <tr id="tableHeader">
+                    <th><div class="empty-state">Select a table from the dropdown above to view data.</div></th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+    </div> <!-- End panel-content -->
+</div> <!-- End panel-container -->
+</div> <!-- End container -->
+
+<div id="toast-container"></div>
+
+<script>
+    const API_BASE = '/api/admin/db';
+    let currentTable = '';
+    let currentColumns = [];
+
+    const token = localStorage.getItem('cm_token');
+    if (!token) {
+        window.location.href = 'login.html';
+    }
+
+    function authHeaders() {
+        return {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        };
+    }
+
+    function showToast(message, isError = false) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${isError ? 'toast-error' : 'toast-success'}`;
+        
+        const icon = document.createElement('i');
+        icon.className = isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check';
+        
+        const text = document.createElement('span');
+        text.textContent = message;
+        
+        toast.appendChild(icon);
+        toast.appendChild(text);
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+    }
+
+    async function loadTables() {
+        try {
+            const res = await fetch(`${API_BASE}/tables`, { headers: authHeaders() });
+            if (res.status === 401 || res.status === 403) {
+                showToast("Unauthorized Access", true);
+                setTimeout(() => window.location.href = 'index.html', 1500);
+                return;
+            }
+            if (!res.ok) throw new Error('Failed to load tables');
+            
+            const tables = await res.json();
+            const select = document.getElementById('tableSelect');
+            tables.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t.charAt(0).toUpperCase() + t.slice(1).replace('_', ' ');
+                select.appendChild(opt);
+            });
+        } catch (e) {
+            showToast(e.message, true);
+        }
+    }
+
+    async function loadTableData(tableName) {
+        currentTable = tableName;
+        const thead = document.getElementById('tableHeader');
+        const tbody = document.getElementById('tableBody');
+        
+        if (!tableName) {
+            thead.innerHTML = '<th><div class="empty-state">Select a table from the dropdown above to view data.</div></th>';
+            tbody.innerHTML = '';
+            return;
+        }
+        
+        try {
+            const res = await fetch(`${API_BASE}/table/${tableName}`, { headers: authHeaders() });
+            if (!res.ok) throw new Error('Failed to fetch table data');
+            const data = await res.json();
+            
+            renderTable(data);
+        } catch (e) {
+            showToast(e.message, true);
+        }
+    }
+
+    function renderTable(data) {
+        const thead = document.getElementById('tableHeader');
+        const tbody = document.getElementById('tableBody');
+        thead.innerHTML = '';
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+            thead.innerHTML = '';
+            tbody.innerHTML = `<tr><td colspan="100%"><div class="empty-state"><i class="fa-solid fa-folder-open"></i><br>No records found in this table.</div></td></tr>`;
+            return;
+        }
+
+        currentColumns = Object.keys(data[0]);
+        
+        currentColumns.forEach(col => {
+            const th = document.createElement('th');
+            th.textContent = col.replace(/_/g, ' ');
+            thead.appendChild(th);
+        });
+        const thActions = document.createElement('th');
+        thActions.textContent = 'Actions';
+        thActions.style.width = '120px';
+        thActions.style.textAlign = 'right';
+        thead.appendChild(thActions);
+
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            
+            const pkCol = currentTable === 'room_moderation' ? 'room_slug' : 'id';
+            const rowId = row[pkCol];
+            tr.dataset.id = rowId;
+
+            currentColumns.forEach(col => {
+                const td = document.createElement('td');
+                td.dataset.col = col;
+                td.textContent = row[col] !== null ? row[col] : 'NULL';
+                tr.appendChild(td);
+            });
+
+            const tdActions = document.createElement('td');
+            tdActions.className = 'actions';
+            tdActions.style.justifyContent = 'flex-end';
+            
+            const btnEdit = document.createElement('button');
+            btnEdit.className = 'action-btn btn-edit';
+            btnEdit.innerHTML = '<i class="fa-solid fa-pen"></i>';
+            btnEdit.title = 'Edit Row';
+            btnEdit.onclick = () => enableEdit(tr, row);
+            
+            const btnSave = document.createElement('button');
+            btnSave.className = 'action-btn btn-save';
+            btnSave.innerHTML = '<i class="fa-solid fa-check"></i>';
+            btnSave.title = 'Save Changes';
+            btnSave.onclick = () => saveRow(tr, pkCol);
+
+            const btnCancel = document.createElement('button');
+            btnCancel.className = 'action-btn btn-cancel';
+            btnCancel.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            btnCancel.title = 'Cancel';
+            btnCancel.onclick = () => cancelEdit(tr, row);
+
+            const btnDelete = document.createElement('button');
+            btnDelete.className = 'action-btn btn-delete';
+            btnDelete.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            btnDelete.title = 'Delete Row';
+            btnDelete.onclick = () => deleteRow(rowId);
+
+            tdActions.appendChild(btnEdit);
+            tdActions.appendChild(btnSave);
+            tdActions.appendChild(btnCancel);
+            tdActions.appendChild(btnDelete);
+            tr.appendChild(tdActions);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function enableEdit(tr, rowData) {
+        const cells = tr.querySelectorAll('td[data-col]');
+        cells.forEach(td => {
+            const col = td.dataset.col;
+            const val = rowData[col] !== null ? rowData[col] : '';
+            td.innerHTML = `<input type="text" class="editable-input" value="${escapeHtml(String(val))}">`;
+        });
+
+        tr.querySelector('.btn-edit').style.display = 'none';
+        tr.querySelector('.btn-delete').style.display = 'none';
+        tr.querySelector('.btn-save').style.display = 'inline-flex';
+        tr.querySelector('.btn-cancel').style.display = 'inline-flex';
+    }
+
+    function cancelEdit(tr, rowData) {
+        const cells = tr.querySelectorAll('td[data-col]');
+        cells.forEach(td => {
+            const col = td.dataset.col;
+            td.innerHTML = '';
+            td.textContent = rowData[col] !== null ? rowData[col] : 'NULL';
+        });
+
+        tr.querySelector('.btn-edit').style.display = 'inline-flex';
+        tr.querySelector('.btn-delete').style.display = 'inline-flex';
+        tr.querySelector('.btn-save').style.display = 'none';
+        tr.querySelector('.btn-cancel').style.display = 'none';
+    }
+
+    async function saveRow(tr, pkCol) {
+        const rowId = tr.dataset.id;
+        const data = {};
+        const cells = tr.querySelectorAll('td[data-col]');
+        
+        cells.forEach(td => {
+            const col = td.dataset.col;
+            const input = td.querySelector('input');
+            if (input) {
+                data[col] = input.value;
+            }
+        });
+
+        try {
+            const res = await fetch(`${API_BASE}/table/${currentTable}/${rowId}`, {
+                method: 'PUT',
+                headers: authHeaders(),
+                body: JSON.stringify(data)
+            });
+            
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to update row');
+            }
+            
+            showToast('Row updated successfully!');
+            loadTableData(currentTable);
+        } catch (e) {
+            showToast(e.message, true);
+        }
+    }
+
+    async function deleteRow(id) {
+        if (!confirm('Are you sure you want to permanently delete this row?')) return;
+
+        try {
+            const res = await fetch(`${API_BASE}/table/${currentTable}/${id}`, {
+                method: 'DELETE',
+                headers: authHeaders()
+            });
+            
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to delete row');
+            }
+            
+            showToast('Row deleted successfully!');
+            loadTableData(currentTable);
+        } catch (e) {
+            showToast(e.message, true);
+        }
+    }
+
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    document.getElementById('tableSelect').addEventListener('change', (e) => {
+        loadTableData(e.target.value);
+    });
+
+    loadTables();
+</script>
+</body>
+</html>

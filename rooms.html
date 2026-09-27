@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caught Me | Chat Rooms</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .room-card {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            color: #fff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border-color: #e05a1e;
+        }
+        .room-title {
+            font-size: 1.25rem;
+            color: #e05a1e;
+            margin-bottom: 10px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .room-count {
+            background: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+        .room-desc {
+            font-size: 0.95rem;
+            color: #aaa;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .room-btn {
+            display: inline-block;
+            background: #e05a1e;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .room-btn:hover {
+            background: #c34e1c;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner">
+        <div class="cookie-text">
+            We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept", you consent to our use of cookies.
+        </div>
+        <button class="cookie-btn" id="acceptCookiesBtn">Accept</button>
+    </div>
+
+    <!-- Side Navigation -->
+    <div class="side-nav-overlay" id="sideNavOverlay"></div>
+    <div class="side-nav" id="sideNav">
+        <div class="side-nav-header">
+            <button class="side-nav-close" id="sideNavCloseBtn">✕</button>
+        </div>
+        <ul class="side-nav-menu">
+            <li>
+                <a href="index.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-house"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Home</span>
+                        <span class="side-nav-desc">Back to the front page</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="rooms.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-comments"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Chat</span>
+                        <span class="side-nav-desc">Full list of chat rooms</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="blog.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Blog</span>
+                        <span class="side-nav-desc">Updates about the chat rooms</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="cam-chat.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-video"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Live Cams</span>
+                        <span class="side-nav-desc">Watch & broadcast live webcams</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <nav class="top-bar">
+        <button class="menu-btn" onclick="window.location.href='index.html'">←</button>
+        <div style="flex-grow: 1; text-align: center; color: white; font-weight: bold; font-size: 1.2rem;">All Chat Rooms</div>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="dark-section" style="padding-top: 80px; min-height: 100vh;">
+        <div class="content-container flex-col">
+            <div class="text-block text-center mb-5">
+                <h1 style="color: #fff; margin-bottom: 10px;">Detailed Room Information</h1>
+                <p style="color: #ccc;">Browse our complete list of chat rooms. Find the perfect place to connect, whether you're looking for general chat, roleplay, or something more specific.</p>
+            </div>
+
+            <div class="rooms-grid">
+                <div class="room-card">
+                    <div class="room-title">Lounge Chat <span class="room-count">1748 users</span></div>
+                    <div class="room-desc">Our most popular general chat room. A great place to start, meet new people, and just hang out. Fast-paced and active 24/7.</div>
+                    <a href="login.html?room=lounge-chat" class="room-btn">Join Lounge</a>
+                </div>
+                
+                <div class="room-card">
+                    <div class="room-title">Sex Chat <span class="room-count">562 users</span></div>
+                    <div class="room-desc">For those looking for hot, steamy conversations. Connect with like-minded adults for dirty talk, picture sharing, and cam sex.</div>
+                    <a href="login.html?room=sex-chat" class="room-btn">Join Sex Chat</a>
+                </div>
+
+                <div class="room-card">
+                    <div class="room-title">RolePlay Chat <span class="room-count">316 users</span></div>
+                    <div class="room-desc">Unleash your fantasies. Find partners for imaginative text-based roleplaying scenarios in a dedicated environment.</div>
+                    <a href="login.html?room=roleplay-chat" class="room-btn">Join RolePlay</a>
+                </div>
+
+                <div class="room-card">
+                    <div class="room-title">Younger4Older <span class="room-count">224 users</span></div>
+                    <div class="room-desc">Connect across generations. A dedicated space for younger adults seeking older partners and vice versa.</div>
+                    <a href="login.html?room=younger4older" class="room-btn">Join Younger4Older</a>
+                </div>
+
+                <div class="room-card">
+                    <div class="room-title">Confessions <span class="room-count">137 users</span></div>
+                    <div class="room-desc">Share your deepest secrets anonymously. A judgment-free zone to confess and discuss taboo topics.</div>
+                    <a href="login.html?room=confessions" class="room-btn">Join Confessions</a>
+                </div>
+
+                <div class="room-card">
+                    <div class="room-title">BDSM Chat <span class="room-count">124 users</span></div>
+                    <div class="room-desc">Explore the world of bondage, discipline, dominance, and submission. Connect with Doms, Subs, and switches.</div>
+                    <a href="login.html?room=bdsm-chat" class="room-btn">Join BDSM</a>
+                </div>
+
+                <div class="room-card">
+                    <div class="room-title">Gay Chat <span class="room-count">101 users</span></div>
+                    <div class="room-desc">A safe and active space for gay, bisexual, and curious men to meet, chat, and share experiences.</div>
+                    <a href="login.html?room=gay-chat" class="room-btn">Join Gay Chat</a>
+                </div>
+                
+                <div class="room-card">
+                    <div class="room-title">Lesbian Chat <span class="room-count">59 users</span></div>
+                    <div class="room-desc">Connect with other women in our dedicated lesbian chat room. A great place for dating, flirting, or finding friends.</div>
+                    <a href="login.html?room=lesbian-chat" class="room-btn">Join Lesbian Chat</a>
+                </div>
+                
+                <div class="room-card">
+                    <div class="room-title">Cam Chat <span class="room-count">56 users</span></div>
+                    <div class="room-desc">Want to see and be seen? Join our live cam room to interact face-to-face with other users from around the world.</div>
+                    <a href="login.html?room=cam-chat" class="room-btn">Join Cam Chat</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="copyright-bar">
+            <p>&copy; 2002 - 2026 Caught Me. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="common.js"></script>
+</body>
+</html>

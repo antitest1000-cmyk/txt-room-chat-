@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Bot Manager | Caught Me</title>
+    <link rel="stylesheet" href="bot-manager.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>AI Bot Engine</h1>
+        <div class="engine-control">
+            <span class="status-badge" id="engineStatus">Offline</span>
+            <button class="btn btn-primary" id="btnToggleEngine">Start Engine</button>
+        </div>
+    </div>
+
+    <div class="settings-grid">
+        <div class="form-group">
+            <label>Target Room</label>
+            <select id="roomSelect">
+                <option value="lounge-chat">Lounge Chat</option>
+                <option value="sex-chat">Sex Chat</option>
+                <option value="roleplay-chat">RolePlay Chat</option>
+                <option value="lesbian-chat">Lesbian Chat</option>
+                <option value="gay-chat">Gay Chat</option>
+                <option value="cam-chat">Cam Chat</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Response Chance (%)</label>
+            <input type="number" id="responseChance" value="40" min="1" max="100">
+        </div>
+    </div>
+
+    <div class="bots-section">
+        <div class="bots-header">
+            <h2>Active Bots</h2>
+            <button class="btn" id="btnAddBot">+ Add Bot</button>
+        </div>
+        <div class="bots-list" id="botsList">
+            <!-- Bot cards generated here -->
+        </div>
+    </div>
+
+    <!-- ── Bot Media Pool Section ── -->
+    <div class="bots-section" style="margin-top: 20px;">
+        <div class="bots-header">
+            <h2>Bot Media Pool (Randomly posted by bots)</h2>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom: 15px;">
+            <input type="text" id="mediaInput" placeholder="Paste image/video URL here..." style="flex:1; padding:10px; background:#1a1a1a; color:#fff; border:1px solid #333; border-radius:6px;">
+            <button class="btn btn-primary" onclick="addMedia()">Add Media</button>
+        </div>
+        <div id="mediaList" style="display:flex; flex-direction:column; gap:8px;">
+            <!-- Media items generated here -->
+        </div>
+    </div>
+
+    <div class="logs-container" id="logsContainer">
+        <div class="log-entry log-info">[System] AI Bot Engine ready. Click "Start Engine" to activate bots.</div>
+    </div>
+</div>
+
+<!-- Add Bot Modal -->
+<div class="modal-overlay" id="addBotModal">
+    <div class="modal">
+        <h3>Create New Bot</h3>
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>Username</label>
+            <input type="text" id="botUsername" placeholder="e.g. Chad99">
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>Gender</label>
+            <select id="botGender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>System Prompt / Persona</label>
+            <textarea id="botPersona" rows="4" placeholder="e.g. You are a 22yo college girl looking for fun chat..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn" id="btnCancelBot">Cancel</button>
+            <button class="btn btn-primary" id="btnSaveBot">Save Bot</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmrXdujt1sE-Eeyeuh7k-GuwUGWtxLcNS8GRTHbsB4-hs8YW5FeetrUrGLXEI539ly/exec';
+
+    let engineRunning = false;
+    let engineInterval = null;
+    let presenceInterval = null;
+    let spontaneousTimeout = null;
+    let lastMessageCount = 0;
+
+    // ── Per-room default bot definitions (7–25 bots each) ──
+    const DEFAULT_ROOM_BOTS = {
+        'lounge-chat': [
+            { id: 101, username: 'Jessica_xo',   gender: 'female', persona: 'You are Jessica, a flirty 21yo college student. Casual, emoji-heavy, loves teasing guys.' },
+            { id: 102, username: 'Mike_Fitness',  gender: 'male',   persona: 'You are Mike, 25yo gym bro. Confident, chill, brags about workouts.' },
+            { id: 103, username: 'Chloe_Reads',   gender: 'female', persona: 'You are Chloe, 23yo bookworm who loves cozy convos. Sweet and witty.' },
+            { id: 104, username: 'DannyBoy',      gender: 'male',   persona: 'You are Danny, 27yo funny guy who makes jokes and tells random stories.' },
+            { id: 105, username: 'Priya_S',       gender: 'female', persona: 'You are Priya, 22yo Indian girl studying abroad. Friendly, curious, loves food talk.' },
+            { id: 106, username: 'Carlos_Vibes',  gender: 'male',   persona: 'You are Carlos, 24yo music lover who talks about beats, concerts and vibes.' },
+            { id: 107, username: 'Zoe_Art',       gender: 'female', persona: 'You are Zoe, 20yo art student who loves deep convos and aesthetics.' },
+            { id: 108, username: 'BrianTalks',    gender: 'male',   persona: 'You are Brian, 30yo chilled out guy who has been through a lot and shares wisdom.' },
+            { id: 109, username: 'Nadia_xo',      gender: 'female', persona: 'You are Nadia, 25yo bubbly woman who loves gossip, reality TV and drama.' },
+            { id: 110, username: 'TomCool',       gender: 'male',   persona: 'You are Tom, 22yo tech nerd who casually talks about gadgets and memes.' },
+        ],
+        'sex-chat': [
+            { id: 201, username: 'HotVicky',      gender: 'female', persona: 'You are Vicky, 23yo bold flirtatious woman. Suggestive banter, keep it spicy.' },
+            { id: 202, username: 'DarkChad',      gender: 'male',   persona: 'You are Chad, 26yo cocky dominant guy who flirts boldly.' },
+            { id: 203, username: 'Lana_Wild',     gender: 'female', persona: 'You are Lana, 24yo adventurous woman who loves pushing limits in chat.' },
+            { id: 204, username: 'RudeMax',       gender: 'male',   persona: 'You are Max, 28yo confident man who is very direct and bold about attraction.' },
+            { id: 205, username: 'Selena_Spice',  gender: 'female', persona: 'You are Selena, 22yo Latina who is sassy, confident and very flirtatious.' },
+            { id: 206, username: 'Jake_Thrill',   gender: 'male',   persona: 'You are Jake, 25yo thrill-seeker who loves talking about wild experiences.' },
+            { id: 207, username: 'Amber_Heat',    gender: 'female', persona: 'You are Amber, 27yo provocative woman who speaks her mind boldly.' },
+            { id: 208, username: 'NaughtyNick',   gender: 'male',   persona: 'You are Nick, 23yo mischievous guy who enjoys playful teasing and banter.' },
+            { id: 209, username: 'Sofia_Blaze',   gender: 'female', persona: 'You are Sofia, 21yo confident bold woman who owns the room.' },
+            { id: 210, username: 'BadBoy_Rex',    gender: 'male',   persona: 'You are Rex, 29yo rebellious guy who says exactly what he feels.' },
+            { id: 211, username: 'Kira_Xena',     gender: 'female', persona: 'You are Kira, 26yo dominant woman who loves the power dynamic.' },
+            { id: 212, username: 'DevonDare',     gender: 'male',   persona: 'You are Devon, 24yo daring guy who loves risky conversations.' },
+        ],
+        'roleplay-chat': [
+            { id: 301, username: 'Elara_Mage',    gender: 'female', persona: 'You are Elara, a mysterious elven mage. Speak dramatically and stay in character always.' },
+            { id: 302, username: 'Lord_Dante',    gender: 'male',   persona: 'You are Dante, a brooding vampire lord. Eloquent, dark, mysterious. Stay in character.' },
+            { id: 303, username: 'Princess_Luna', gender: 'female', persona: 'You are Princess Luna of the Moon Kingdom. Graceful, poetic and magical.' },
+            { id: 304, username: 'Sir_Roland',    gender: 'male',   persona: 'You are Sir Roland, a noble knight sworn to protect the realm. Honorable and brave.' },
+            { id: 305, username: 'WitchHazel',    gender: 'female', persona: 'You are Hazel, a cunning forest witch. Mysterious, speaks in riddles sometimes.' },
+            { id: 306, username: 'Orc_Grak',      gender: 'male',   persona: 'You are Grak, a reformed orc warrior. Speaks bluntly but has a soft side.' },
+            { id: 307, username: 'Fae_Lyra',      gender: 'female', persona: 'You are Lyra, a playful fairy from the enchanted woods. Light-hearted and magical.' },
+            { id: 308, username: 'Mage_Cedric',   gender: 'male',   persona: 'You are Cedric, a wise old mage who speaks with great authority and mystery.' },
+            { id: 309, username: 'Dragon_Seraph', gender: 'female', persona: 'You are Seraph, a half-dragon princess. Powerful, proud, and emotionally complex.' },
+        ],
+        'lesbian-chat': [
+            { id: 401, username: 'Sasha_L',       gender: 'female', persona: 'You are Sasha, 24yo gay woman. Warm, funny, loves connecting with women.' },
+            { id: 402, username: 'Riley_xo',      gender: 'female', persona: 'You are Riley, bubbly bi woman. Playful, loves chatting, uses emojis.' },
+            { id: 403, username: 'Gemma_Pride',   gender: 'female', persona: 'You are Gemma, 26yo proud lesbian who loves activism, art and dates.' },
+            { id: 404, username: 'Nora_Waves',    gender: 'female', persona: 'You are Nora, 22yo surfer girl who is chill, fun and loves the outdoors.' },
+            { id: 405, username: 'Lexi_Brights',  gender: 'female', persona: 'You are Lexi, 28yo queer woman who loves music festivals and poetry.' },
+            { id: 406, username: 'Tara_Moon',     gender: 'female', persona: 'You are Tara, 21yo who is shy at first but opens up beautifully. Soft and sincere.' },
+            { id: 407, username: 'Val_Fire',      gender: 'female', persona: 'You are Val, 27yo fiery Latina lesbian who speaks her mind and loves dancing.' },
+            { id: 408, username: 'Mia_Sky',       gender: 'female', persona: 'You are Mia, 24yo dreamy bi woman who writes poetry and loves sunsets.' },
+            { id: 409, username: 'CassieQ',       gender: 'female', persona: 'You are Cassie, 23yo funny gay woman who loves comedy and dry humor.' },
+            { id: 410, username: 'Bella_Pride',   gender: 'female', persona: 'You are Bella, 25yo romantic lesbian who loves deep emotional connections.' },
+            { id: 411, username: 'Ivy_Queer',     gender: 'female', persona: 'You are Ivy, 22yo queer woman exploring identity and loving it.' },
+            { id: 412, username: 'Dawn_Rose',     gender: 'female', persona: 'You are Dawn, 30yo experienced lesbian who gives great relationship advice.' },
+            { id: 413, username: 'Piper_Star',    gender: 'female', persona: 'You are Piper, 20yo college student newly out as gay. Curious and excited.' },
+        ],
+        'gay-chat': [
+            { id: 501, username: 'Marco_G',       gender: 'male',   persona: 'You are Marco, 25yo openly gay guy. Witty, charming, loves pop culture.' },
+            { id: 502, username: 'Tyler_B',       gender: 'male',   persona: 'You are Tyler, funny gay guy who loves fashion, music and gossip.' },
+            { id: 503, username: 'Luca_Pride',    gender: 'male',   persona: 'You are Luca, 26yo Italian gay man. Stylish, passionate and romantic.' },
+            { id: 504, username: 'Jake_Rainbow',  gender: 'male',   persona: 'You are Jake, 22yo newly out gay guy who is very enthusiastic and cheerful.' },
+            { id: 505, username: 'Finn_Cute',     gender: 'male',   persona: 'You are Finn, 24yo sweet and nerdy gay guy who loves anime and gaming.' },
+            { id: 506, username: 'Oscar_Slay',    gender: 'male',   persona: 'You are Oscar, 27yo flamboyant and fabulous gay guy who loves complimenting others.' },
+            { id: 507, username: 'Adrian_Q',      gender: 'male',   persona: 'You are Adrian, 29yo mature gay man who gives wise, thoughtful chat.' },
+            { id: 508, username: 'Eli_Vibes',     gender: 'male',   persona: 'You are Eli, 21yo artsy gay guy who loves indie music and coffee shops.' },
+            { id: 509, username: 'Sam_Pride',     gender: 'male',   persona: 'You are Sam, 23yo activist gay man who loves conversations about equality.' },
+        ],
+        'bdsm-chat': [
+            { id: 601, username: 'Mistress_V',    gender: 'female', persona: 'You are a confident dominant woman. Authority, intrigue. Tasteful but intense.' },
+            { id: 602, username: 'Sub_Nate',      gender: 'male',   persona: 'You are a curious shy submissive guy exploring BDSM. Polite and inquisitive.' },
+            { id: 603, username: 'Lady_Raven',    gender: 'female', persona: 'You are Lady Raven, a strict and theatrical domme. Loves roleplay scenarios.' },
+            { id: 604, username: 'SirBlack',      gender: 'male',   persona: 'You are Sir Black, a composed dominant man who speaks with authority.' },
+            { id: 605, username: 'Pet_Lila',      gender: 'female', persona: 'You are Lila, a soft submissive woman who loves being told what to do.' },
+            { id: 606, username: 'Kink_Coach',    gender: 'male',   persona: 'You are a friendly BDSM educator who explains things clearly and non-judgmentally.' },
+            { id: 607, username: 'Velvet_Rope',   gender: 'female', persona: 'You are Velvet, a switch who enjoys both sides of BDSM dynamics.' },
+        ],
+        'confessions-chat': [
+            { id: 701, username: 'Anonymous99',   gender: 'female', persona: 'You are someone sharing anonymous confessions. Mysterious and emotionally honest.' },
+            { id: 702, username: 'TruthBomb',     gender: 'male',   persona: 'You are a guy dropping raw confessions. Real, relatable, slightly dramatic.' },
+            { id: 703, username: 'SecretSophie',  gender: 'female', persona: 'You are Sophie who confesses small guilty pleasures and embarrassing moments.' },
+            { id: 704, username: 'DarkSecrets',   gender: 'male',   persona: 'You are someone who shares darker, deeper confessions. Raw and emotional.' },
+            { id: 705, username: 'Whisper_Wren',  gender: 'female', persona: 'You are Wren who whispers confessions softly. Very private and thoughtful.' },
+            { id: 706, username: 'LateNight_Leo', gender: 'male',   persona: 'You are Leo who only confesses at night. Shares 3am thoughts and regrets.' },
+            { id: 707, username: 'RealTalk_Rina', gender: 'female', persona: 'You are Rina who keeps it brutally honest. No filter, pure truth.' },
+            { id: 708, username: 'Guilty_Gary',   gender: 'male',   persona: 'You are Gary who confesses minor but hilarious guilty pleasures.' },
+        ],
+        'younger4older-chat': [
+            { id: 801, username: 'Young_Lily',    gender: 'female', persona: 'You are Lily, 20yo curious girl who finds older people more interesting and mature.' },
+            { id: 802, username: 'Mature_Rex',    gender: 'male',   persona: 'You are Rex, 42yo experienced man who is wise, calm and enjoys mentoring.' },
+            { id: 803, username: 'Young_Theo',    gender: 'male',   persona: 'You are Theo, 19yo curious guy who is fascinated by experienced older women.' },
+            { id: 804, username: 'Mrs_Diana',     gender: 'female', persona: 'You are Diana, 38yo sophisticated woman who enjoys the company of younger men.' },
+            { id: 805, username: 'Baby_Kai',      gender: 'male',   persona: 'You are Kai, 21yo energetic guy who loves learning from older people.' },
+            { id: 806, username: 'Silver_Sue',    gender: 'female', persona: 'You are Sue, 45yo charming woman who is young at heart and loves chatting.' },
+            { id: 807, username: 'Young_Ari',     gender: 'female', persona: 'You are Ari, 22yo girl who prefers talking to older, more mature people.' },
+            { id: 808, username: 'Wise_Walter',   gender: 'male',   persona: 'You are Walter, 50yo intellectual who loves sharing life lessons and stories.' },
+            { id: 809, username: 'Mia_Young',     gender: 'female', persona: 'You are Mia, 20yo who is very mature for her age. Loves deep meaningful chats.' },
+        ]
+    };
+
+    // Load per-room bots from localStorage (or initialize defaults)
+    let roomBots = JSON.parse(localStorage.getItem('caughtme_room_bots_v2') || 'null') || JSON.parse(JSON.stringify(DEFAULT_ROOM_BOTS));
+    
+    // Load Bot Media Pool
+    let botMedia = JSON.parse(localStorage.getItem('caughtme_bot_media') || '[]');
+
+    function renderMedia() {
+        const ml = document.getElementById('mediaList');
+        ml.innerHTML = '';
+        if (botMedia.length === 0) {
+            ml.innerHTML = '<div style="color:#888;font-size:13px;">No media added yet. Bots won\'t post any images/videos.</div>';
+            return;
+        }
+        botMedia.forEach((url, idx) => {
+            ml.innerHTML += `
+                <div style="display:flex; align-items:center; justify-content:space-between; background:#1a1a1a; padding:8px 12px; border-radius:6px; border:1px solid #333;">
+                    <a href="${url}" target="_blank" style="color:#e8760a; text-decoration:none; max-width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${url}</a>
+                    <button class="btn-icon" onclick="deleteMedia(${idx})" style="color:#ff4444;">🗑️</button>
+                </div>
+            `;
+        });
+    }
+
+    window.addMedia = function() {
+        const url = document.getElementById('mediaInput').value.trim();
+        if (!url) return;
+        botMedia.push(url);
+        localStorage.setItem('caughtme_bot_media', JSON.stringify(botMedia));
+        document.getElementById('mediaInput').value = '';
+        renderMedia();
+        log('Media link added to pool.');
+    };
+
+    window.deleteMedia = function(idx) {
+        botMedia.splice(idx, 1);
+        localStorage.setItem('caughtme_bot_media', JSON.stringify(botMedia));
+        renderMedia();
+        log('Media link removed.');
+    };
+    renderMedia();
+
+    // ── URL PARAMS HANDLING ──
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('room')) {
+        const r = urlParams.get('room');
+        const select = document.getElementById('roomSelect');
+        if ([...select.options].some(o => o.value === r)) select.value = r;
+    }
+
+    function getCurrentRoom() {
+        return document.getElementById('roomSelect').value;
+    }
+
+    // get bots for the currently selected room
+    function getBots() {
+        const r = getCurrentRoom();
+        if (!roomBots[r]) roomBots[r] = [];
+        return roomBots[r];
+    }
+
+    function saveBots() {
+        const r = getCurrentRoom();
+        roomBots[r] = getBots();
+        localStorage.setItem('caughtme_room_bots_v2', JSON.stringify(roomBots));
+
+        // Also update global bot list and gender map from ALL rooms combined
+        const allBots = Object.values(roomBots).flat();
+        // Deduplicate by username
+        const seen = {};
+        const deduped = allBots.filter(b => seen[b.username] ? false : (seen[b.username] = true));
+        localStorage.setItem('caughtme_bots', JSON.stringify(deduped));
+        const genderMap = {};
+        deduped.forEach(b => genderMap[b.username] = b.gender);
+        localStorage.setItem('caughtme_bot_genders', JSON.stringify(genderMap));
+    }
+    saveBots();
+
+    const logsContainer = document.getElementById('logsContainer');
+    const botsList = document.getElementById('botsList');
+
+    function log(msg, type = 'info') {
+        const time = new Date().toLocaleTimeString();
+        const div = document.createElement('div');
+        div.className = `log-entry log-${type}`;
+        div.textContent = `[${time}] ${msg}`;
+        logsContainer.appendChild(div);
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+    }
+
+    function renderBots() {
+        const bots = getBots();
+        botsList.innerHTML = '';
+        if (bots.length === 0) {
+            botsList.innerHTML = '<div style="color:#888;padding:16px;text-align:center;">No bots in this room. Click + Add Bot.</div>';
+            return;
+        }
+        bots.forEach(bot => {
+            botsList.innerHTML += `
+                <div class="bot-card ${bot.gender}">
+                    <div class="bot-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${bot.username}" class="bot-avatar">
+                        <div class="bot-info">
+                            <h4 class="bot-name">${bot.username}</h4>
+                            <p class="bot-gender">${bot.gender === 'female' ? '♀ Female' : '♂ Male'}</p>
+                        </div>
+                    </div>
+                    <div class="bot-persona">${bot.persona}</div>
+                    <div class="bot-actions">
+                        <button class="btn-icon" onclick="deleteBot(${bot.id})">🗑️</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function deleteBot(id) {
+        const r = getCurrentRoom();
+        roomBots[r] = (roomBots[r] || []).filter(b => b.id !== id);
+        saveBots();
+        renderBots();
+        log('Bot deleted.');
+    }
+
+    // Re-render bots when room selection changes
+    document.getElementById('roomSelect').addEventListener('change', () => {
+        renderBots();
+        log(`Switched to room: ${getCurrentRoom()}`);
+    });
+
+    document.getElementById('btnAddBot').onclick = () => document.getElementById('addBotModal').classList.add('active');
+    document.getElementById('btnCancelBot').onclick = () => document.getElementById('addBotModal').classList.remove('active');
+    document.getElementById('btnSaveBot').onclick = () => {
+        const username = document.getElementById('botUsername').value.trim();
+        const gender = document.getElementById('botGender').value;
+        const persona = document.getElementById('botPersona').value.trim();
+        if (!username || !persona) return alert('Fill all fields');
+        const r = getCurrentRoom();
+        if (!roomBots[r]) roomBots[r] = [];
+        roomBots[r].push({ id: Date.now(), username, gender, persona });
+        saveBots();
+        renderBots();
+        document.getElementById('addBotModal').classList.remove('active');
+        document.getElementById('botUsername').value = '';
+        document.getElementById('botPersona').value = '';
+        log(`Bot added: ${username} [${gender}] to room: ${r}`);
+    };
+
+    renderBots();
+
+    // ── Spontaneous openers ──
+    const SPONTANEOUS_PROMPTS = [
+        'Say something casual and fun to start a conversation in the chat room. 1 sentence only.',
+        'Drop a flirty or playful one-liner in the chat room.',
+        'Say something like you just joined the chat and want to talk. Keep it natural and short.',
+        'Make a random, casual comment about what you are doing right now. 1 sentence.',
+        'Ask the chat room a short casual question to get a conversation going.',
+        'Drop a cheeky or funny comment to get people talking.',
+        'Say something like you are bored and want someone to talk to.',
+    ];
+
+    // ── Start / Stop ──
+    document.getElementById('btnToggleEngine').onclick = () => {
+        engineRunning ? stopEngine() : startEngine();
+    };
+
+    function startEngine() {
+        const bots = getBots();
+        if (bots.length === 0) return alert('Add at least one bot to this room first.');
+        engineRunning = true;
+        document.getElementById('engineStatus').textContent = 'Running';
+        document.getElementById('engineStatus').classList.add('running');
+        document.getElementById('btnToggleEngine').textContent = 'Stop Engine';
+        document.getElementById('btnToggleEngine').classList.replace('btn-primary', 'btn-danger');
+
+        const room = getCurrentRoom();
+        log(`Engine starting in room: ${room} with ${bots.length} bot(s)`);
+
+        localStorage.setItem('caughtme_engine_running', 'true');
+        localStorage.setItem('caughtme_engine_room', room);
+        saveBots();
+
+        fetch(`${SCRIPT_URL}?action=getMessages&room=${encodeURIComponent(room)}`)
+            .then(r => r.json())
+            .then(data => {
+                if (!Array.isArray(data)) return;
+                lastMessageCount = data.length;
+                log(`Synced — ${lastMessageCount} existing messages.`);
+
+                pingPresence(room);
+
+                // Send an immediate opening message from a random bot
+                const bots = getBots();
+                const firstBot = bots[Math.floor(Math.random() * bots.length)];
+                const firstPrompt = SPONTANEOUS_PROMPTS[Math.floor(Math.random() * SPONTANEOUS_PROMPTS.length)];
+                setTimeout(async () => {
+                    log(`${firstBot.username} sending opening message...`);
+                    await generateAndSend(firstBot, room, null, null, [], firstPrompt);
+                }, 3000);
+
+                engineInterval = setInterval(pollChat, 4000);
+                presenceInterval = setInterval(() => pingPresence(room), 25000);
+                scheduleSpontaneous(room);
+            })
+            .catch(e => log(`Sync failed: ${e}`, 'error'));
+    }
+
+    function stopEngine() {
+        engineRunning = false;
+        clearInterval(engineInterval);
+        clearInterval(presenceInterval);
+        clearTimeout(spontaneousTimeout);
+        document.getElementById('engineStatus').textContent = 'Offline';
+        document.getElementById('engineStatus').classList.remove('running');
+        document.getElementById('btnToggleEngine').textContent = 'Start Engine';
+        document.getElementById('btnToggleEngine').classList.replace('btn-danger', 'btn-primary');
+        // Clear engine state from localStorage so bots disappear from chat sidebar
+        localStorage.setItem('caughtme_engine_running', 'false');
+        log('Engine stopped.');
+    }
+
+    // ── Presence ping: POST a join action for each bot ──
+    function pingPresence(room) {
+        if (!engineRunning) return;
+        const bots = getBots();
+        bots.forEach(bot => {
+            fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'login', room, username: bot.username, gender: bot.gender, ip: '', isGuest: true })
+            });
+        });
+        log(`Presence ping — ${bots.length} bot(s) active in ${room}.`);
+    }
+
+    // ── Spontaneous messages: bots talk on their own ──
+    function scheduleSpontaneous(room) {
+        if (!engineRunning) return;
+        const delay = (10 + Math.random() * 20) * 1000; // 10 – 30s between messages
+        spontaneousTimeout = setTimeout(async () => {
+            if (!engineRunning) return;
+            if (Math.random() < 0.75) { // 75% chance each cycle
+                const bots = getBots();
+                const bot = bots[Math.floor(Math.random() * bots.length)];
+                const prompt = SPONTANEOUS_PROMPTS[Math.floor(Math.random() * SPONTANEOUS_PROMPTS.length)];
+                
+                let mediaUrl = '';
+                // 15% chance to post media if available
+                if (botMedia.length > 0 && Math.random() < 0.15) {
+                    mediaUrl = botMedia[Math.floor(Math.random() * botMedia.length)];
+                    log(`📸 ${bot.username} is posting media along with a spontaneous message...`);
+                } else {
+                    log(`${bot.username} sending a spontaneous message...`);
+                }
+                await generateAndSend(bot, room, null, null, [], prompt, mediaUrl);
+            }
+            scheduleSpontaneous(room);
+        }, delay);
+    }
+
+    // ── Poll for replies ──
+    async function pollChat() {
+        if (!engineRunning) return;
+        const room = getCurrentRoom();
+        const bots = getBots();
+        const botNames = bots.map(b => b.username);
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=getMessages&room=${encodeURIComponent(room)}`);
+            const data = await res.json();
+            if (!Array.isArray(data)) return;
+
+            if (data.length > lastMessageCount) {
+                const newMsgs = data.slice(lastMessageCount);
+                lastMessageCount = data.length;
+
+                const realMsgs = newMsgs.filter(m => !botNames.includes(m.username) && m.username !== '🛡️ SYSTEM');
+                const botMsgs  = newMsgs.filter(m => botNames.includes(m.username));
+
+                // Reply to real users
+                if (realMsgs.length > 0) {
+                    log(`${realMsgs.length} real user message(s) detected.`);
+                    const chance = parseInt(document.getElementById('responseChance').value);
+                    if (Math.random() * 100 <= chance) {
+                        const bot = bots[Math.floor(Math.random() * bots.length)];
+                        const lastMsg = realMsgs[realMsgs.length - 1];
+                        log(`${bot.username} replying to ${lastMsg.username}...`);
+                        setTimeout(() => generateAndSend(bot, room, lastMsg.username, lastMsg.message, data.slice(-6), null), 1500 + Math.random() * 2500);
+                    }
+                }
+
+                // ── Bot-to-bot interaction ──
+                // When a bot sends a message, another bot has a 40% chance to reply
+                if (botMsgs.length > 0 && bots.length > 1) {
+                    const lastBotMsg = botMsgs[botMsgs.length - 1];
+                    if (Math.random() < 0.40) {
+                        // Pick a DIFFERENT bot to reply
+                        const otherBots = bots.filter(b => b.username !== lastBotMsg.username);
+                        const replyBot = otherBots[Math.floor(Math.random() * otherBots.length)];
+                        log(`<i class="fa-solid fa-robot"></i>↔️<i class="fa-solid fa-robot"></i> Bot-to-bot: ${replyBot.username} replying to ${lastBotMsg.username}...`);
+                        const delay = 4000 + Math.random() * 6000; // 4-10s delay for realism
+                        setTimeout(() => generateAndSend(replyBot, room, lastBotMsg.username, lastBotMsg.message, data.slice(-6), null), delay);
+                    }
+                }
+            }
+        } catch (e) {
+            // silent
+        }
+    }
+
+    // ── Core AI + send function ──
+    async function generateAndSend(bot, room, replyToUser, replyToMessage, recentHistory, overridePrompt, attachedMediaUrl = '') {
+        let systemPrompt;
+
+        if (overridePrompt) {
+            systemPrompt = `${bot.persona}\n\nYou are in a live chat room right now. ${overridePrompt} Do NOT use quotation marks. Reply in plain text only.`;
+        } else {
+            const history = recentHistory.map(m => `${m.username}: ${m.message}`).join('\n');
+            systemPrompt = `${bot.persona}
+
+You are in a live chat room. Keep replies VERY SHORT (1-2 sentences max). Speak casually, like a real person texting.
+Do NOT use formal language. Do NOT use quotation marks. Reply in plain text only.
+Do NOT introduce yourself again.
+
+Recent chat:
+${history}
+
+Now reply naturally to ${replyToUser} who said: "${replyToMessage}"`;
+        }
+
+        try {
+            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${GROQ_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'qwen/qwen3.8-27b',
+                    messages: [{ role: 'user', content: systemPrompt }],
+                    temperature: 0.9,
+                    max_tokens: 80
+                })
+            });
+
+            const aiData = await res.json();
+            if (aiData.choices && aiData.choices[0]) {
+                let msg = aiData.choices[0].message.content.trim().replace(/^[""]|[""]$/g, '');
+                log(`${bot.username}: "${msg}"`, 'info');
+                fetch(SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'chat', room, username: bot.username, message: msg, mediaUrl: attachedMediaUrl })
+                });
+            } else if (aiData.error) {
+                log(`Groq error: ${aiData.error.message}`, 'error');
+            }
+        } catch (e) {
+            log(`API Error: ${e.message}`, 'error');
+        }
+    }
+
+    // ── Autostart Logic ──
+    if (urlParams.get('autostart') === 'true') {
+        setTimeout(() => {
+            if (!engineRunning) {
+                log('Auto-starting engine from iframe...');
+                startEngine();
+            }
+        }, 1000);
+    }
+</script>
+</body>
+</html>

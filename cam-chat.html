@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Caught Me - Cam Chat Room. Live webcam chat with adults worldwide.">
+    <title>Caught Me | Cam Chat Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .cam-room-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-height: 80vh;
+            padding: 40px 20px;
+        }
+        .cam-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e8760a;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 13px;
+            color: #e8760a;
+            margin-bottom: 20px;
+        }
+        .cam-room-hero h1 { font-size: 32px; color: #fff; margin-bottom: 12px; }
+        .cam-room-hero p  { font-size: 15px; color: #aaa; max-width: 540px; line-height: 1.7; margin-bottom: 28px; }
+        .cam-features {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+        .cam-feature {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 16px 20px;
+            width: 150px;
+            text-align: center;
+        }
+        .cam-feature .icon  { font-size: 26px; margin-bottom: 8px; }
+        .cam-feature .label { font-size: 12px; color: #aaa; }
+        .cam-warning-strip {
+            border: 1px solid #c0392b;
+            border-radius: 8px;
+            padding: 14px 18px;
+            max-width: 540px;
+            width: 100%;
+            font-size: 13px;
+            color: #ff9999;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .cam-warning-strip strong { color: #fff; }
+        .btn-enter-cam {
+            background: #e8760a;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 36px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-enter-cam:hover { background: #d4690a; }
+        .btn-back { display: block; margin-top: 14px; color: #666; font-size: 13px; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner">
+        <div class="cookie-text">
+            We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept", you consent to our use of cookies.
+        </div>
+        <button class="cookie-btn" id="acceptCookiesBtn">Accept</button>
+    </div>
+
+    <!-- Side Navigation -->
+    <div class="side-nav-overlay" id="sideNavOverlay"></div>
+    <div class="side-nav" id="sideNav">
+        <div class="side-nav-header">
+            <button class="side-nav-close" id="sideNavCloseBtn">✕</button>
+        </div>
+        <ul class="side-nav-menu">
+            <li>
+                <a href="index.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-house"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Home</span>
+                        <span class="side-nav-desc">Back to the front page</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="rooms.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-comments"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Chat</span>
+                        <span class="side-nav-desc">Full list of chat rooms</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="blog.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Blog</span>
+                        <span class="side-nav-desc">Updates about the chat rooms</span>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="cam-chat.html">
+                    <span class="side-nav-icon"><i class="fa-solid fa-video"></i></span>
+                    <div class="side-nav-text">
+                        <span class="side-nav-title">Live Cams</span>
+                        <span class="side-nav-desc">Watch & broadcast live webcams</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <nav class="top-bar">
+        <button class="menu-btn" id="hamburgerBtn">☰</button>
+        <div class="toggle-switch">
+            <input type="checkbox" id="theme-switch" checked>
+            <label for="theme-switch" class="switch"></label>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="logo-container">
+            <a href="index.html" class="site-logo">
+                Caught Me
+                <span class="speech-tail"></span>
+            </a>
+        </div>
+
+        <div class="cam-room-hero">
+            <div class="cam-badge">
+                <span>🔴</span> LIVE NOW · <span id="liveCount">56</span> users on cam
+            </div>
+
+            <h1><i class="fa-solid fa-video"></i> Live Cam Chat Room</h1>
+            <p>Go live with your webcam and chat with adults from around the world in real-time. See and be seen — no downloads, no installs, 100% browser-based.</p>
+
+            <div class="cam-features">
+                <div class="cam-feature">
+                    <div class="icon">📷</div>
+                    <div class="label">Webcam Streaming</div>
+                </div>
+                <div class="cam-feature">
+                    <div class="icon">🎙️</div>
+                    <div class="label">Live Audio</div>
+                </div>
+                <div class="cam-feature">
+                    <div class="icon">🖥️</div>
+                    <div class="label">Screen Share</div>
+                </div>
+                <div class="cam-feature">
+                    <div class="icon"><i class="fa-solid fa-comments"></i></div>
+                    <div class="label">Live Chat</div>
+                </div>
+            </div>
+
+            <div class="cam-warning-strip">
+                <strong>⚠️ Important Notice:</strong> You must be <strong>18 years or older</strong> to access this room.
+                Your webcam session <strong>may be recorded</strong> by other participants using third-party software.
+                Caught Me is <strong>not responsible</strong> for any recordings made, content shared, or any consequences
+                arising from your voluntary participation in live cam sessions. Full warnings and terms will be displayed before you enter.
+            </div>
+
+            <a class="btn-enter-cam" href="login.html?room=cam-room">Enter Cam Room →</a>
+            <a class="btn-back" href="index.html">← Back to Chat Rooms</a>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="copyright-bar">
+            <p>⚖️ Caught Me is not responsible for user-generated content in cam rooms. All users must be 18+. &copy; 2002 - 2026 Caught Me. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        // Update the button link if already logged in
+        if (sessionStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token')) {
+            const rawUsername = localStorage.getItem('cm_username') || 'User';
+            const isGuest = localStorage.getItem('cm_isGuest') === 'true';
+            const gender = localStorage.getItem('cm_gender') || 'unknown';
+            const enterBtn = document.querySelector('.btn-enter-cam');
+            if (enterBtn) {
+                enterBtn.href = `cam-room.html?room=cam-room&username=${encodeURIComponent(rawUsername)}&guest=${isGuest}&gender=${encodeURIComponent(gender)}`;
+            }
+        }
+    </script>
+    <script src="common.js"></script>
+</body>
+</html>
