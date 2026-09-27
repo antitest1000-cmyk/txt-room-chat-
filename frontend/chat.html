@@ -1253,6 +1253,11 @@
         }
         connectSocket(); // ← Connect immediately, not after fetch
 
+        // Real-time user list updates from server
+        socket.on('user_list', (users) => {
+            renderUserList(mergeBotUsers(users));
+        });
+
         function fetchMessages() {
             fetch(`${SERVER_URL}/api/chat/messages?room=${encodeURIComponent(room)}`)
                 .then(r => r.json())
@@ -1509,7 +1514,7 @@
         }
 
         function fetchUsers() {
-            fetch(`${SCRIPT_URL}?action=getUsers&room=${encodeURIComponent(room)}`)
+            fetch(`${SERVER_URL}/api/chat/users?room=${encodeURIComponent(room)}`)
                 .then(r => r.json())
                 .then(users => {
                     if (Array.isArray(users)) renderUserList(mergeBotUsers(users));

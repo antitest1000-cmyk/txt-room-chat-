@@ -12,6 +12,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// In-memory map: room -> Map(socketId -> { username, gender })
+const roomUsers = {};
+
 // Serve the entire website from the parent folder
 app.use(express.static(path.join(__dirname, '..')));
 
@@ -283,6 +286,14 @@ app.get('/api/chat/messages', (req, res) => {
         res.json(rows.reverse());
     });
 });
+
+// --- LIVE USERS IN ROOM ---
+app.get('/api/chat/users', (req, res) => {
+    const room = req.query.room;
+    if (!room) return res.status(400).json({ error: 'room required' });
+    const users = roomUsers[room] ? Array.from(roomUsers[room].values()) : [];
+    res.json(users);
+});
 // --- ROOM MODERATION API ---
 app.get('/api/admin/room-moderation/:room_slug', authenticateToken, authorizeOwner, (req, res) => {
     db.get('SELECT * FROM room_moderation WHERE room_slug = ?', [req.params.room_slug], (err, row) => {
@@ -396,8 +407,14 @@ app.delete('/api/admin/bot-engine/bots/:id', authenticateToken, authorizeOwner, 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
-    socket.on('join_room', ({ room, username, isGuest }) => {
+    socket.on('join_room', ({ room, username, isGuest, gender }) => {
         socket.join(room);
+        socket._room = room;
+        socket._username = username;
+        if (!roomUsers[room]) roomUsers[room] = new Map();
+        roomUsers[room].set(socket.id, { username, gender: gender || (isGuest ? 'Guest' : 'Member') });
+        // Broadcast updated user list to everyone in the room
+        io.to(room).emit('user_list', Array.from(roomUsers[room].values()));
         console.log(`${username} joined room: ${room}`);
     });
 
@@ -508,6 +525,11 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
+        const room = socket._room;
+        if (room && roomUsers[room]) {
+            roomUsers[room].delete(socket.id);
+            io.to(room).emit('user_list', Array.from(roomUsers[room].values()));
+        }
     });
 });
 
