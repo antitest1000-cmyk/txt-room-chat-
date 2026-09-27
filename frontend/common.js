@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 4. Dynamic Website Images Manager
-    const SERVER_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://YOUR_RENDER_URL.onrender.com';
+    const SERVER_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://txt-room-chat.onrender.com';
     fetch(SERVER_URL + '/api/images')
         .then(res => res.json())
         .then(imageMap => {

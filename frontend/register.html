@@ -141,7 +141,7 @@
         // Update login link to keep the room parameter
         document.getElementById('loginLink').href = 'login.html?room=' + encodeURIComponent(room);
 
-        const SERVER_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://YOUR_RENDER_URL.onrender.com';
+        const SERVER_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://txt-room-chat.onrender.com';
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmrXdujt1sE-Eeyeuh7k-GuwUGWtxLcNS8GRTHbsB4-hs8YW5FeetrUrGLXEI539ly/exec';
 
         document.getElementById('registerForm').addEventListener('submit', function(e) {
