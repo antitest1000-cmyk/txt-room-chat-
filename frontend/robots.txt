@@ -2,17 +2,16 @@ User-agent: *
 Allow: /
 
 # Block admin/private pages from indexing
-Disallow: /frontend/owner-panel.html
-Disallow: /frontend/owner-panel.js
-Disallow: /frontend/bot-manager.html
-Disallow: /frontend/database.html
-Disallow: /frontend/moderate.html
-Disallow: /frontend/banned.html
-Disallow: /frontend/cam-room.html
-Disallow: /frontend/chat.html
+Disallow: /owner-panel
+Disallow: /bot-manager
+Disallow: /database
+Disallow: /moderate
+Disallow: /banned
+Disallow: /cam-room
+Disallow: /chat
 
 # Block backend/server files
 Disallow: /server/
 
 # Sitemap location
-Sitemap: https://txtroom.netlify.app/frontend/sitemap.xml
+Sitemap: https://txtroom.netlify.app/sitemap.xml
