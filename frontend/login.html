@@ -223,14 +223,13 @@
 
         const formattedRoomName = formatRoomName(room);
 
-        // Auto-login if token exists
-        if (localStorage.getItem('cm_token')) {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            const lastRoom = localStorage.getItem('cm_room') || 'lounge-chat';
-            const lastUser = localStorage.getItem('cm_username');
-            if (lastUser) {
-                window.location.href = (lastRoom === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(lastRoom) + '&username=' + encodeURIComponent(lastUser) + '&guest=false';
-            }
+        // Auto-login if token exists or guest is active
+        const storedUser = localStorage.getItem('cm_username');
+        const isGuestUser = localStorage.getItem('cm_isGuest') === 'true';
+        const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token');
+
+        if (isLoggedIn && storedUser) {
+            window.location.href = (room === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(room) + '&username=' + encodeURIComponent(storedUser) + '&guest=' + isGuestUser;
         }
 
         // Update UI
@@ -303,6 +302,8 @@
                             return;
                         }
                         localStorage.setItem('cm_token', data.token);
+                        localStorage.setItem('cm_username', username);
+                        localStorage.setItem('cm_isGuest', 'false');
                         sessionStorage.setItem('isLoggedIn', 'true');
 
                         if (data.user.role === 'OWNER') {
