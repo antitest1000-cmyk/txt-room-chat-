@@ -224,6 +224,15 @@
                     <span>I have read and agree to the <a href="/terms" target="_blank" style="color:#e8760a;">Terms of Service</a>. I understand Caught Me is <strong>not responsible</strong> for any content arising from this session.</span>
                 </label>
             </div>
+            
+            <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">
+                <h4 style="font-size: 13px; color: #aaa; margin-bottom: 8px;">Ad Preferences</h4>
+                <div style="display:flex; gap:10px; font-size:12px;">
+                    <label><input type="radio" name="adPref" value="both" checked> Top & Bottom (Support Us)</label>
+                    <label><input type="radio" name="adPref" value="top"> Top Only</label>
+                    <label><input type="radio" name="adPref" value="bottom"> Bottom Only</label>
+                </div>
+            </div>
             <button class="disc-enter-btn" id="enterCamBtn" onclick="enterCamRoom()">
                 Enter Live Cam Room →
             </button>
@@ -264,7 +273,7 @@
             <a class="btn-leave-cam" href="/" onclick="stopCam()">Leave</a>
         </div>
     </div>
-    <div style="display:flex; justify-content:center; margin:10px 0; max-width:100%; overflow:hidden;">
+    <div id="topAdContainer" style="display:flex; justify-content:center; margin:10px 0; max-width:100%; overflow:hidden;">
         <script>
           atOptions = {
             'key' : '7f80743993cfa8accd2c208f41f8a0b6',
@@ -449,9 +458,25 @@
         }
 
         document.getElementById('disclaimerOverlay').style.display = 'none';
+        
+        // Apply Ad Preferences
+        const adPref = document.querySelector('input[name="adPref"]:checked').value;
+        if (adPref === 'top') {
+            const bottomAd = document.getElementById('bottomAdContainer');
+            if(bottomAd) bottomAd.style.display = 'none';
+            document.body.style.paddingBottom = '0px';
+        } else if (adPref === 'bottom') {
+            const topAd = document.getElementById('topAdContainer');
+            if(topAd) topAd.style.display = 'none';
+        }
+
         addCamSystemMsg('✅ You entered the cam room. You are now LIVE!');
         addCamSystemMsg('⚠️ Reminder: Sessions may be recorded by other users.');
         startSimulatedCams();
+        
+        // Start In-Chat Ad Loop (30-60s)
+        setTimeout(injectChatAd, 30000 + Math.random() * 30000);
+
         fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
             body: JSON.stringify({ action:'login', username: displayUsername, room:'cam-room', gender:'', ip:'' }) });
     }
@@ -760,6 +785,47 @@
         msgs.appendChild(el); msgs.scrollTop = msgs.scrollHeight;
     }
 
+    function injectChatAd() {
+        const msgs = document.getElementById('camMessages');
+        if (!msgs) return;
+        const adContainer = document.createElement('div');
+        adContainer.style.cssText = "margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 8px; text-align:center; border: 1px solid #333;";
+        
+        const iframe = document.createElement('iframe');
+        iframe.width = 320;
+        iframe.height = 50;
+        iframe.frameBorder = 0;
+        iframe.scrolling = "no";
+        iframe.style.overflow = "hidden";
+        
+        const adHtml = `
+            <html>
+            <body style="margin:0;padding:0;background:transparent;display:flex;justify-content:center;align-items:center;">
+                <script>
+                  atOptions = {
+                    'key' : 'e159659fdf8bffd0a714c7824e44d0b7',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://www.highrevenueformat.com/e159659fdf8bffd0a714c7824e44d0b7/invoke.js"></script>
+            </body>
+            </html>
+        `;
+        iframe.srcdoc = adHtml;
+        
+        adContainer.innerHTML = '<div style="font-size:10px; color:#666; margin-bottom:4px; text-transform:uppercase;">Sponsored</div>';
+        adContainer.appendChild(iframe);
+        
+        msgs.appendChild(adContainer);
+        msgs.scrollTop = msgs.scrollHeight;
+
+        // Loop randomly between 30 and 60 seconds
+        setTimeout(injectChatAd, 30000 + Math.random() * 30000);
+    }
+
     function addCamMsg(username, text) {
         const msgs = document.getElementById('camMessages');
         const isG  = username.startsWith('Guest-');
@@ -818,7 +884,7 @@
     scheduleFakeChat();
 </script>
     <script src="common.js"></script>
-<div class="ad-mobile-sticky" style="justify-content:center; align-items:center; background:#000;">
+<div id="bottomAdContainer" class="ad-mobile-sticky" style="justify-content:center; align-items:center; background:#000;">
     <script>
       atOptions = {
         'key' : '2636eb05bf0294121b2c2ef4f44879ec',
