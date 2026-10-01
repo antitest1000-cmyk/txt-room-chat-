@@ -162,9 +162,10 @@
         }
         .ad-leaderboard { width: 100%; max-width: 728px; height: 90px; }
         .ad-mobile-sticky {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
+            position: fixed; bottom: 0; left: 0; right: 0; min-height: 60px; height: auto;
             margin: 0; border-top: 1px solid #444; z-index: 1000;
             display: flex; justify-content: center; align-items: center; background: #000; width: 100%;
+            padding: 5px 0 calc(5px + env(safe-area-inset-bottom)) 0;
         }
         .ad-inchat { margin: 8px 0; border-radius: 6px; padding: 10px; text-align: center; background: #1a1a1a; border: 1px solid #333; }
 

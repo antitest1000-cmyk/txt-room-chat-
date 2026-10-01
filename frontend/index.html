@@ -26,24 +26,41 @@
             backdrop-filter: blur(5px);
             animation: splashFadeIn 0.45s ease;
         }
+
         @keyframes splashFadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
+
         #welcome-splash.hidden {
             animation: splashFadeOut 0.35s ease forwards;
             pointer-events: none;
         }
+
         @keyframes splashFadeOut {
-            from { opacity: 1; transform: scale(1); }
-            to   { opacity: 0; transform: scale(0.97); }
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.97);
+            }
         }
+
         /* Speech bubble logo above card */
         .splash-logo-wrap {
             display: flex;
             justify-content: center;
             margin-bottom: 1.1rem;
         }
+
         .splash-bubble-logo {
             background: #e05a1e;
             color: #fff;
@@ -53,9 +70,10 @@
             border-radius: 999px;
             position: relative;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 20px rgba(224,90,30,0.45);
+            box-shadow: 0 4px 20px rgba(224, 90, 30, 0.45);
             display: inline-block;
         }
+
         /* speech-bubble tail */
         .splash-bubble-logo::after {
             content: '';
@@ -67,6 +85,7 @@
             border-right: 10px solid transparent;
             border-top: 13px solid #e05a1e;
         }
+
         .splash-card {
             background: #1e1e1e;
             border: 1px solid #333;
@@ -74,30 +93,36 @@
             max-width: 500px;
             width: 100%;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.75);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
         }
+
         .splash-header {
             background: #e05a1e;
             padding: 0.65rem 1.2rem;
         }
+
         .splash-header h2 {
             color: #fff;
             font-size: 1.1rem;
             font-weight: 700;
             margin: 0;
         }
+
         .splash-body {
             padding: 1.4rem 1.6rem;
             color: #ccc;
             font-size: 0.92rem;
             line-height: 1.7;
         }
+
         .splash-body p {
             margin: 0 0 1rem;
         }
+
         .splash-body p:last-of-type {
             margin-bottom: 0;
         }
+
         .splash-enter-btn {
             display: block;
             width: calc(100% - 3.2rem);
@@ -115,6 +140,7 @@
             letter-spacing: 0.3px;
             font-family: inherit;
         }
+
         .splash-enter-btn:hover {
             background: #e05a1e;
             border-color: #e05a1e;
@@ -123,29 +149,32 @@
         /* === Cookie Banner === */
         #cookie-banner {
             position: fixed;
-            top: -150px;
+            bottom: -150px;
             left: 0;
             width: 100%;
             background: #111;
             color: #fff;
             padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
             z-index: 10001;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 20px;
-            transition: top 0.4s ease;
+            transition: bottom 0.4s ease;
             box-sizing: border-box;
         }
+
         #cookie-banner.show {
-            top: 0;
+            bottom: 60px;
         }
+
         .cookie-text {
             font-size: 0.95rem;
             max-width: 600px;
             line-height: 1.5;
         }
+
         .cookie-btn {
             background: #e05a1e;
             color: #fff;
@@ -158,9 +187,11 @@
             transition: background 0.2s;
             white-space: nowrap;
         }
+
         .cookie-btn:hover {
             background: #c34e1c;
         }
+
         @media (max-width: 600px) {
             #cookie-banner {
                 flex-direction: column;
@@ -175,16 +206,19 @@
             left: -320px;
             width: 300px;
             height: 100%;
-            background: #d65922; /* matching the image color */
+            background: #d65922;
+            /* matching the image color */
             z-index: 10000;
             transition: left 0.3s ease;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
         }
+
         .side-nav.open {
             left: 0;
         }
+
         .side-nav-header {
             padding: 15px;
             background: #c34e1c;
@@ -192,6 +226,7 @@
             justify-content: flex-start;
             border-bottom: 2px solid #fff;
         }
+
         .side-nav-close {
             background: none;
             border: none;
@@ -200,6 +235,7 @@
             cursor: pointer;
             line-height: 1;
         }
+
         .side-nav-menu {
             list-style: none;
             padding: 0;
@@ -207,9 +243,11 @@
             display: flex;
             flex-direction: column;
         }
+
         .side-nav-menu li {
             border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
+
         .side-nav-menu li a {
             display: flex;
             align-items: center;
@@ -218,48 +256,63 @@
             text-decoration: none;
             transition: background 0.2s;
         }
+
         .side-nav-menu li a:hover {
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
         }
+
         .side-nav-icon {
             font-size: 24px;
             margin-right: 20px;
             width: 30px;
             text-align: center;
         }
+
         .side-nav-text {
             display: flex;
             flex-direction: column;
         }
+
         .side-nav-title {
             font-size: 18px;
             font-weight: 700;
         }
+
         .side-nav-desc {
             font-size: 13px;
             color: rgba(255, 255, 255, 0.9);
             margin-top: 4px;
         }
-        
+
         .side-nav-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 9999;
             display: none;
         }
+
         .side-nav-overlay.open {
             display: block;
         }
+
         .ad-mobile-sticky {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
-            margin: 0; border-top: 1px solid #444; z-index: 1000;
-            display: flex; background: #000; width: 100%; justify-content: center; align-items: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            min-height: 60px; height: auto;
+            margin: 0;
+            border-top: 1px solid #444;
+            z-index: 1000;
+            display: flex;
+            background: #000;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            padding: 5px 0 calc(5px + env(safe-area-inset-bottom)) 0;
         }
         body { padding-bottom: 60px; }
-        @media (max-width: 768px) {
-            .ad-mobile-sticky { display: flex; }
-        }
     </style>
 </head>
 
@@ -277,10 +330,18 @@
                     <h2>CaughtMe.com</h2>
                 </div>
                 <div class="splash-body">
-                    <p>Welcome to <strong>Caught Me</strong> — a free, anonymous chat platform where you can connect with real people from all over the world, no account needed.</p>
-                    <p>Our chat rooms are open to adults aged 18+ and cover a wide range of interests. Simply pick a username, choose your gender, and jump straight into a live conversation — text or cam, your call.</p>
-                    <p>Whether you're on your phone, tablet, or desktop, Caught Me keeps things smooth and private wherever you are.</p>
-                    <p style="font-size: 0.85rem; color: #888; margin-top: 15px;">By entering, you confirm you are 18+ and agree to our <a href="/terms" style="color: #e05a1e; text-decoration: underline;">Terms of Use</a>, <a href="/privacy" style="color: #e05a1e; text-decoration: underline;">Privacy Policy</a>, and <a href="/2257" style="color: #e05a1e; text-decoration: underline;">18 U.S.C. 2257 Statement</a>.</p>
+                    <p>Welcome to <strong>Caught Me</strong> — a free, anonymous chat platform where you can connect
+                        with real people from all over the world, no account needed.</p>
+                    <p>Our chat rooms are open to adults aged 18+ and cover a wide range of interests. Simply pick a
+                        username, choose your gender, and jump straight into a live conversation — text or cam, your
+                        call.</p>
+                    <p>Whether you're on your phone, tablet, or desktop, Caught Me keeps things smooth and private
+                        wherever you are.</p>
+                    <p style="font-size: 0.85rem; color: #888; margin-top: 15px;">By entering, you confirm you are 18+
+                        and agree to our <a href="/terms" style="color: #e05a1e; text-decoration: underline;">Terms of
+                            Use</a>, <a href="/privacy" style="color: #e05a1e; text-decoration: underline;">Privacy
+                            Policy</a>, and <a href="/2257" style="color: #e05a1e; text-decoration: underline;">18
+                            U.S.C. 2257 Statement</a>.</p>
                 </div>
                 <button class="splash-enter-btn" id="splashEnterBtn">Enter Chat</button>
             </div>
@@ -290,7 +351,8 @@
     <!-- Cookie Consent Banner -->
     <div id="cookie-banner">
         <div class="cookie-text">
-            We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept", you consent to our use of cookies.
+            We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our
+            traffic. By clicking "Accept", you consent to our use of cookies.
         </div>
         <button class="cookie-btn" id="acceptCookiesBtn">Accept</button>
     </div>
@@ -353,13 +415,13 @@
     <!-- Top Leaderboard Ad -->
     <div style="display:flex; justify-content:center; margin:15px 0; max-width:100%; overflow:hidden;">
         <script>
-          atOptions = {
-            'key' : '7f80743993cfa8accd2c208f41f8a0b6',
-            'format' : 'iframe',
-            'height' : 90,
-            'width' : 728,
-            'params' : {}
-          };
+            atOptions = {
+                'key': '7f80743993cfa8accd2c208f41f8a0b6',
+                'format': 'iframe',
+                'height': 90,
+                'width': 728,
+                'params': {}
+            };
         </script>
         <script src="https://www.highrevenueformat.com/7f80743993cfa8accd2c208f41f8a0b6/invoke.js"></script>
     </div>
@@ -382,16 +444,26 @@
                 </div>
                 <div class="panel-content scrollable">
                     <ul class="room-list">
-                        <li class="active"><a href="/lounge"><span class="room-name">Lounge Chat</span> <span class="room-count">1748</span></a></li>
-                        <li><a href="/sex-chat"><span class="room-name">Sex Chat</span> <span class="room-count">562</span></a></li>
-                        <li><a href="/roleplay-chat"><span class="room-name">RolePlay Chat</span> <span class="room-count">316</span></a></li>
-                        <li><a href="/younger4older"><span class="room-name">Younger4Older</span> <span class="room-count">224</span></a></li>
-                        <li><a href="/confessions"><span class="room-name">Confessions</span> <span class="room-count">137</span></a></li>
-                        <li><a href="/bdsm-chat"><span class="room-name">BDSM Chat</span> <span class="room-count">124</span></a></li>
-                        <li><a href="/gay-chat"><span class="room-name">Gay Chat</span> <span class="room-count">101</span></a></li>
-                        <li><a href="/tributes"><span class="room-name">Tributes</span> <span class="room-count">87</span></a></li>
-                        <li><a href="/lesbian-chat"><span class="room-name">Lesbian Chat</span> <span class="room-count">59</span></a></li>
-                        <li><a href="/cam-chat"><span class="room-name">Cam Chat</span> <span class="room-count">56</span></a></li>
+                        <li class="active"><a href="/lounge"><span class="room-name">Lounge Chat</span> <span
+                                    class="room-count">1748</span></a></li>
+                        <li><a href="/sex-chat"><span class="room-name">Sex Chat</span> <span
+                                    class="room-count">562</span></a></li>
+                        <li><a href="/roleplay-chat"><span class="room-name">RolePlay Chat</span> <span
+                                    class="room-count">316</span></a></li>
+                        <li><a href="/younger4older"><span class="room-name">Younger4Older</span> <span
+                                    class="room-count">224</span></a></li>
+                        <li><a href="/confessions"><span class="room-name">Confessions</span> <span
+                                    class="room-count">137</span></a></li>
+                        <li><a href="/bdsm-chat"><span class="room-name">BDSM Chat</span> <span
+                                    class="room-count">124</span></a></li>
+                        <li><a href="/gay-chat"><span class="room-name">Gay Chat</span> <span
+                                    class="room-count">101</span></a></li>
+                        <li><a href="/tributes"><span class="room-name">Tributes</span> <span
+                                    class="room-count">87</span></a></li>
+                        <li><a href="/lesbian-chat"><span class="room-name">Lesbian Chat</span> <span
+                                    class="room-count">59</span></a></li>
+                        <li><a href="/cam-chat"><span class="room-name">Cam Chat</span> <span
+                                    class="room-count">56</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -402,7 +474,8 @@
                     <h2>Free Chat</h2>
                 </div>
                 <div class="panel-content">
-                    <button class="live-cams-btn" onclick="window.location.href='cam-chat.html'"><i class="fa-solid fa-video"></i> Live Cams</button>
+                    <button class="live-cams-btn" onclick="window.location.href='cam-chat.html'"><i
+                            class="fa-solid fa-video"></i> Live Cams</button>
 
                     <p>Welcome to Caught Me! One of the fastest growing online sex chat rooms. We provide interactive
                         free chat rooms connecting adults from all around the world. There is a selection of free chat
@@ -494,13 +567,13 @@
             <!-- Mid-Page Ad -->
             <div style="display:flex; justify-content:center; margin:30px 0; max-width:100%; overflow:hidden;">
                 <script>
-                  atOptions = {
-                    'key' : 'e229515534cf9fb0c1515222d9ffc5e0',
-                    'format' : 'iframe',
-                    'height' : 250,
-                    'width' : 300,
-                    'params' : {}
-                  };
+                    atOptions = {
+                        'key': 'e229515534cf9fb0c1515222d9ffc5e0',
+                        'format': 'iframe',
+                        'height': 250,
+                        'width': 300,
+                        'params': {}
+                    };
                 </script>
                 <script src="https://www.highrevenueformat.com/e229515534cf9fb0c1515222d9ffc5e0/invoke.js"></script>
             </div>
@@ -624,7 +697,9 @@
 
         <!-- Deep Red/Maroon Copyright Bar -->
         <div class="copyright-bar">
-            <p>&copy; 2002 - 2026 Caught Me. All rights reserved. &nbsp;|&nbsp; Inspired by <a href="http://ifreechat.com/" target="_blank" rel="noopener" style="color:#e05a1e;text-decoration:none;">ifreechat.com</a></p>
+            <p>&copy; 2002 - 2026 Caught Me. All rights reserved. &nbsp;|&nbsp; Inspired by <a
+                    href="http://ifreechat.com/" target="_blank" rel="noopener"
+                    style="color:#e05a1e;text-decoration:none;">ifreechat.com</a></p>
         </div>
     </footer>
 
@@ -642,17 +717,17 @@
         }
     </script>
     <script src="common.js"></script>
-    
+
     <!-- Sticky Mobile Footer Ad -->
     <div class="ad-mobile-sticky">
         <script>
-          atOptions = {
-            'key' : '2636eb05bf0294121b2c2ef4f44879ec',
-            'format' : 'iframe',
-            'height' : 50,
-            'width' : 320,
-            'params' : {}
-          };
+            atOptions = {
+                'key': '2636eb05bf0294121b2c2ef4f44879ec',
+                'format': 'iframe',
+                'height': 50,
+                'width': 320,
+                'params': {}
+            };
         </script>
         <script src="https://www.highrevenueformat.com/2636eb05bf0294121b2c2ef4f44879ec/invoke.js"></script>
     </div>
