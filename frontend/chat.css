@@ -668,6 +668,12 @@ ul {
     /* Show the mobile users button */
     #btn-users-mobile {
         display: flex !important;
+        font-size: 0 !important;
+        padding: 5px 8px !important;
+    }
+    #btn-users-mobile::before {
+        content: "👥";
+        font-size: 14px;
     }
 
     /* Top bar tweaks */
@@ -686,13 +692,34 @@ ul {
     }
 
     .btn-rooms {
+        font-size: 0;
         padding: 0 10px;
-        font-size: 13px;
+    }
+
+    .btn-rooms i {
+        font-size: 16px;
     }
 
     .room-tab {
-        padding: 8px 12px;
+        padding: 8px 10px;
         font-size: 13px;
+        white-space: nowrap;
+        max-width: 90px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-menu-btn {
+        white-space: nowrap;
+    }
+    
+    .btn-leave {
+        font-size: 0;
+        padding: 5px 8px;
+    }
+    .btn-leave a::before {
+        content: "🚪";
+        font-size: 16px;
     }
 
     /* Composer – stack emoji/actions above input on very small screens */
