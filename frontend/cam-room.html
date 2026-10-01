@@ -153,6 +153,26 @@
             .cam-topbar { padding: 0 8px; }
             .cam-topbar .room-tag, .cam-topbar .username-tag { display: none; }
         }
+        /* Ad Placeholders */
+        .ad-placeholder {
+            background: #222; border: 1px dashed #555; color: #777;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold; letter-spacing: 1px;
+            margin: 10px auto; text-transform: uppercase;
+        }
+        .ad-leaderboard { width: 100%; max-width: 728px; height: 90px; }
+        .ad-mobile-sticky {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 50px;
+            margin: 0; border-top: 1px solid #444; z-index: 1000;
+            display: none; background: #000; width: 100%;
+        }
+        .ad-inchat { margin: 8px 0; border-radius: 6px; padding: 10px; text-align: center; background: #1a1a1a; border: 1px solid #333; }
+
+        @media (max-width: 768px) {
+            .ad-leaderboard { height: 50px; max-width: 320px; }
+            .ad-mobile-sticky { display: flex; }
+            .cam-layout { padding-bottom: 50px; }
+        }
     </style>
 </head>
 <body>
@@ -206,6 +226,7 @@
             <button class="disc-enter-btn" id="enterCamBtn" onclick="enterCamRoom()">
                 Enter Live Cam Room →
             </button>
+            <div class="ad-placeholder ad-leaderboard" style="height:50px; margin-top:15px; margin-bottom: 0;">AD (300x50)</div>
             <a class="disc-leave-link" href="/">← No thanks, take me back</a>
         </div>
 
@@ -231,6 +252,7 @@
             <a class="btn-leave-cam" href="/" onclick="stopCam()">Leave</a>
         </div>
     </div>
+    <div class="ad-placeholder ad-leaderboard">TOP BANNER AD (728x90)</div>
 
     <div class="cam-layout">
 
@@ -276,6 +298,7 @@
             <div class="cam-messages" id="camMessages">
                 <div class="cam-msg system-msg">Welcome to Live Cam Chat! Be respectful.</div>
                 <div class="cam-msg system-msg" style="color:#c0392b;">⚠️ Recording other users without consent is prohibited.</div>
+                <div class="ad-placeholder ad-inchat">IN-CHAT AD</div>
             </div>
             <div class="cam-composer">
                 <input type="text" id="camChatInput" placeholder="Type a message..." maxlength="300">
@@ -758,5 +781,6 @@
     scheduleFakeChat();
 </script>
     <script src="common.js"></script>
+<div class="ad-placeholder ad-mobile-sticky">STICKY MOBILE FOOTER AD (320x50)</div>
 </body>
 </html>
