@@ -7,7 +7,7 @@
     align-items: center; gap: 20px; transition: bottom 0.4s ease;
     box-sizing: border-box; font-family: 'Open Sans', sans-serif;
 }
-#cookie-banner.show { bottom: 0; }
+#cookie-banner.show { bottom: 60px; }
 .cookie-text { font-size: 13px; max-width: 600px; line-height: 1.5; }
 .cookie-btn {
     background: #e8760a; color: #fff; border: none;
@@ -67,7 +67,7 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    padding-bottom: 50px; /* Make room for sticky ad */
+    padding-bottom: 60px; /* Make room for sticky ad */
 }
 
 button {
