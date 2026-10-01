@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const topBar = document.querySelector('.top-bar');
     if (topBar && !window.location.pathname.includes('chat.html') && !window.location.pathname.includes('cam-room.html')) {
         const toggleSwitch = topBar.querySelector('.toggle-switch');
-        const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token');
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token');
         
         const rightContainer = document.createElement('div');
         rightContainer.style.cssText = 'display:flex; align-items:center; gap: 20px;';
@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
             topBar.appendChild(rightContainer);
             
             document.getElementById('globalLogoutBtn').addEventListener('click', () => {
-                sessionStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('cm_token');
                 localStorage.removeItem('cm_username');
                 localStorage.removeItem('cm_isGuest');

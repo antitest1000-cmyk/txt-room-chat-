@@ -194,7 +194,7 @@
     </footer>
     <script>
         // Update the button link if already logged in
-        if (sessionStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token')) {
+        if (localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token')) {
             const rawUsername = localStorage.getItem('cm_username') || 'User';
             const isGuest = localStorage.getItem('cm_isGuest') === 'true';
             const gender = localStorage.getItem('cm_gender') || 'unknown';

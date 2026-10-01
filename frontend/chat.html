@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -953,7 +953,7 @@
         // ════════════════════════════════════════════════════
         //  AUTH CHECK
         // ════════════════════════════════════════════════════
-        if (sessionStorage.getItem('isLoggedIn') !== 'true' && !localStorage.getItem('cm_token')) {
+        if (localStorage.getItem('isLoggedIn') !== 'true' && !localStorage.getItem('cm_token')) {
             window.location.href = 'login.html';
         }
 
@@ -1833,9 +1833,10 @@
         });
 
         document.getElementById('ddLogout').addEventListener('click', () => {
-            sessionStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('cm_token');
             localStorage.removeItem('cm_username');
+            localStorage.removeItem('cm_isGuest');
             window.location.href = 'index.html';
         });
         document.getElementById('ddLogin').addEventListener('click', () => {

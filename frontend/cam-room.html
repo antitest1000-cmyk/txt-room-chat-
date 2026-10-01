@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -147,6 +147,8 @@
             .cam-grid { grid-template-columns: 1fr; }
             .warning-block { font-size: 12px; padding: 10px 12px; }
             .disc-checks label { font-size: 12px; }
+            .cam-topbar { padding: 0 8px; }
+            .cam-topbar .room-tag, .cam-topbar .username-tag { display: none; }
         }
     </style>
 </head>
@@ -284,7 +286,7 @@
     // ════════════════════════════════════════════════
     //  AUTH CHECK
     // ════════════════════════════════════════════════
-    if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
         window.location.href = 'login.html';
     }
 
@@ -691,7 +693,7 @@
     function addCamSystemMsg(text) {
         const msgs = document.getElementById('camMessages');
         const el = document.createElement('div');
-        el.className = 'cam-msg system-msg'; el.textContent = text;
+        el.className = 'cam-msg system-msg'; el.innerHTML = text;
         msgs.appendChild(el); msgs.scrollTop = msgs.scrollHeight;
     }
 

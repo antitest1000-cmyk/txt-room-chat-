@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -226,7 +226,7 @@
         // Auto-login if token exists or guest is active
         const storedUser = localStorage.getItem('cm_username');
         const isGuestUser = localStorage.getItem('cm_isGuest') === 'true';
-        const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token');
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token');
 
         if (isLoggedIn && storedUser) {
             window.location.href = (room === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(room) + '&username=' + encodeURIComponent(storedUser) + '&guest=' + isGuestUser;
@@ -277,7 +277,9 @@
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: 'login', username, room, gender, isGuest: true, ip: '' })
                 }).then(() => {
-                    sessionStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('cm_username', username);
+                    localStorage.setItem('cm_isGuest', 'true');
                     window.location.href = (room === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(room) + '&username=' + encodeURIComponent(username) + '&guest=true';
                 });
             } else {
@@ -304,7 +306,7 @@
                         localStorage.setItem('cm_token', data.token);
                         localStorage.setItem('cm_username', username);
                         localStorage.setItem('cm_isGuest', 'false');
-                        sessionStorage.setItem('isLoggedIn', 'true');
+                        localStorage.setItem('isLoggedIn', 'true');
 
                         if (data.user.role === 'OWNER') {
                             if (confirm('Login successful. Go to Owner Panel? (Cancel to join Chat)')) {
