@@ -88,7 +88,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 5. Global Login / Logout Button in Top Nav
     const topBar = document.querySelector('.top-bar');
-    if (topBar && !window.location.pathname.includes('chat.html') && !window.location.pathname.includes('cam-room.html')) {
+    const isChatRoomPage = document.getElementById('userMenuBtn') !== null || document.querySelector('.cam-layout') !== null;
+    if (topBar && !isChatRoomPage) {
         const toggleSwitch = topBar.querySelector('.toggle-switch');
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token');
         
