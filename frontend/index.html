@@ -404,8 +404,13 @@
     </div>
 
     <!-- Top Navigation Bar -->
-    <nav class="top-bar">
-        <button class="menu-btn" id="hamburgerBtn">☰</button>
+    <nav class="top-bar" style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <button class="menu-btn" id="hamburgerBtn">☰</button>
+            <div id="indexRewardsBtn" style="display:none; cursor:pointer; background:#222; padding:5px 12px; border-radius:20px; color:#e8760a; font-weight:bold; align-items:center; gap:8px; border:1px solid #444;" onclick="showRewardsModal()">
+                <i class="fa-solid fa-trophy"></i> <span id="indexTimerDisplay" style="font-variant-numeric:tabular-nums; color:#fff; font-size:14px;">0s</span>
+            </div>
+        </div>
         <div class="toggle-switch">
             <input type="checkbox" id="theme-switch" checked>
             <label for="theme-switch" class="switch"></label>
@@ -717,6 +722,16 @@
         }
     </script>
     <script src="common.js"></script>
+    <script src="rewards.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token');
+            const indexRewardsBtn = document.getElementById('indexRewardsBtn');
+            if (indexRewardsBtn && isLoggedIn) {
+                indexRewardsBtn.style.display = 'flex';
+            }
+        });
+    </script>
 
     <!-- Sticky Mobile Footer Ad -->
     <div class="ad-mobile-sticky">

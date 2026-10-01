@@ -146,6 +146,10 @@ function updateRewardsUI() {
     if (timeDisp) {
         timeDisp.textContent = formatTime(timeSpent);
     }
+    const indexDisp = document.getElementById('indexTimerDisplay');
+    if (indexDisp) {
+        indexDisp.textContent = formatTime(timeSpent);
+    }
 
     const container = document.getElementById('rewardsListContainer');
     if (container) {
@@ -183,12 +187,22 @@ function showRewardsModal() {
 // Start tracking immediately when script loads
 document.addEventListener('DOMContentLoaded', () => {
     buildRewardsModal();
-    startTimeTracking();
+    
+    // Only track time if we are inside a chat room (chat.html or cam-room.html)
+    const isChatRoom = window.location.pathname.includes('chat') || window.location.pathname.includes('cam-room');
+    if (isChatRoom) {
+        startTimeTracking();
+    }
+    
+    // Update display immediately for non-chat pages
+    updateRewardsUI();
     
     // Attempt to hook into window visibility/focus to pause timer if they leave?
     // User asked "stop when the user left teh room left the webstie". 
     // Usually leaving the page stops the JS anyway, but we can also use visibility API.
     document.addEventListener("visibilitychange", () => {
+        if (!isChatRoom) return;
+        
         if (document.hidden) {
             stopTimeTracking();
             saveRewards();
