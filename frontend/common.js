@@ -114,4 +114,59 @@ document.addEventListener("DOMContentLoaded", () => {
             topBar.appendChild(rightContainer);
         }
     }
+
+    // 6. Time Tracking and Rewards (Chat & Cam Rooms only)
+    if (window.location.pathname.includes('chat.html') || window.location.pathname.includes('cam-room.html')) {
+        let timeSpent = parseInt(localStorage.getItem('cm_time_spent') || '0');
+        
+        // Milestones in seconds
+        const MILESTONES = [
+            { time: 300, name: 'Bronze Chatter (5 Mins)', gift: '🥉 Bronze Badge' },
+            { time: 1800, name: 'Silver Chatter (30 Mins)', gift: '🥈 Silver Badge & VIP Star' },
+            { time: 3600, name: 'Gold Chatter (1 Hour)', gift: '🥇 Gold Crown' },
+            { time: 7200, name: 'Diamond Chatter (2 Hours)', gift: '💎 Diamond Ring' }
+        ];
+
+        let nextMilestoneIdx = MILESTONES.findIndex(m => m.time > timeSpent);
+        if (nextMilestoneIdx === -1) nextMilestoneIdx = MILESTONES.length;
+
+        setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                timeSpent++;
+                localStorage.setItem('cm_time_spent', timeSpent.toString());
+
+                if (nextMilestoneIdx < MILESTONES.length && timeSpent >= MILESTONES[nextMilestoneIdx].time) {
+                    const milestone = MILESTONES[nextMilestoneIdx];
+                    showRewardPopup(milestone);
+                    nextMilestoneIdx++;
+                }
+            }
+        }, 1000);
+
+        function showRewardPopup(milestone) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px);';
+            overlay.innerHTML = `
+                <div style="background:#1a1a1a; border:2px solid #e8760a; border-radius:16px; padding:32px; max-width:400px; text-align:center; box-shadow: 0 10px 40px rgba(232, 118, 10, 0.4); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                    <div style="font-size:64px; margin-bottom:16px; animation: bounce 2s infinite;">🎁</div>
+                    <h2 style="color:#e8760a; margin-bottom:12px; margin-top:0; font-family:sans-serif;">Milestone Reached!</h2>
+                    <p style="color:#ddd; margin-bottom:16px; font-size:16px; font-family:sans-serif;">You have unlocked the <strong>${milestone.name}</strong> reward!</p>
+                    <div style="font-size:32px; padding:16px; background:#2a2a2a; border-radius:12px; margin-bottom:24px; border:1px dashed #555;">
+                        ${milestone.gift}
+                    </div>
+                    <button onclick="this.closest('[style*=position]').remove()" style="background:#e8760a; color:#fff; border:none; padding:12px 32px; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer;">Claim Reward</button>
+                </div>
+            `;
+            if (!document.getElementById('rewardStyles')) {
+                const style = document.createElement('style');
+                style.id = 'rewardStyles';
+                style.innerHTML = `
+                    @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+                    @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
+                `;
+                document.head.appendChild(style);
+            }
+            document.body.appendChild(overlay);
+        }
+    }
 });
