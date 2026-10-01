@@ -67,6 +67,7 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    padding-bottom: 50px; /* Make room for sticky ad */
 }
 
 button {
