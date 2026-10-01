@@ -123,23 +123,23 @@
         /* === Cookie Banner === */
         #cookie-banner {
             position: fixed;
-            bottom: -150px;
+            top: -150px;
             left: 0;
             width: 100%;
             background: #111;
             color: #fff;
             padding: 20px;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
             z-index: 10001;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 20px;
-            transition: bottom 0.4s ease;
+            transition: top 0.4s ease;
             box-sizing: border-box;
         }
         #cookie-banner.show {
-            bottom: 60px;
+            top: 0;
         }
         .cookie-text {
             font-size: 0.95rem;
