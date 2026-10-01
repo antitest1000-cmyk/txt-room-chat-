@@ -222,7 +222,7 @@ ul {
 .app-container {
     display: flex;
     flex: 1;
-    height: calc(100vh - var(--topbar-height));
+    min-height: 0;
     position: relative;
 }
 
