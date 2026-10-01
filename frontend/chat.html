@@ -652,6 +652,25 @@
         .qp-save:hover {
             background: #d06808;
         }
+        /* Ad Placeholders */
+        .ad-placeholder {
+            background: #222; border: 1px dashed #555; color: #777;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold; letter-spacing: 1px;
+            margin: 10px auto; text-transform: uppercase;
+        }
+        .ad-leaderboard { width: 100%; max-width: 728px; height: 90px; }
+        .ad-mobile-sticky {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 50px;
+            margin: 0; border-top: 1px solid #444; z-index: 1000;
+            display: none; background: #000; width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .ad-leaderboard { height: 50px; max-width: 320px; }
+            .ad-mobile-sticky { display: flex; }
+            .chat-layout { padding-bottom: 50px; }
+        }
     </style>
 </head>
 
@@ -755,6 +774,7 @@
             </div>
         </div>
     </nav>
+    <div class="ad-placeholder ad-leaderboard">TOP BANNER AD (728x90)</div>
 
     <!-- Main App Container -->
     <div class="app-container">
@@ -1856,6 +1876,7 @@
         }
     </script>
     <script src="common.js"></script>
+<div class="ad-placeholder ad-mobile-sticky">STICKY MOBILE FOOTER AD (320x50)</div>
 </body>
 
 </html>
