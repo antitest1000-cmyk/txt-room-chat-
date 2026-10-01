@@ -254,8 +254,9 @@
         .ad-mobile-sticky {
             position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
             margin: 0; border-top: 1px solid #444; z-index: 1000;
-            display: none; background: #000; width: 100%; justify-content: center; align-items: center;
+            display: flex; background: #000; width: 100%; justify-content: center; align-items: center;
         }
+        body { padding-bottom: 60px; }
         @media (max-width: 768px) {
             .ad-mobile-sticky { display: flex; }
         }
