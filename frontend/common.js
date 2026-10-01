@@ -19,11 +19,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sideNavCloseBtn) sideNavCloseBtn.addEventListener('click', closeNav);
     if (sideNavOverlay) sideNavOverlay.addEventListener('click', closeNav);
 
-    // 2. Cookie Banner Logic
+    // 2. Cookie Banner Logic (Disabled by user request)
     const cookieBanner = document.getElementById('cookie-banner');
     const acceptCookiesBtn = document.getElementById('acceptCookiesBtn');
 
     if (cookieBanner && acceptCookiesBtn) {
+        /*
         if (!localStorage.getItem('cookiesAccepted')) {
             setTimeout(() => {
                 cookieBanner.classList.add('show');
@@ -42,6 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem('cookiesAccepted', 'true');
             cookieBanner.classList.remove('show');
         });
+        */
+        // Force hide just in case
+        cookieBanner.style.display = 'none';
     }
 
     // 3. Theme Switcher Logic
