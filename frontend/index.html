@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -251,6 +251,14 @@
         .side-nav-overlay.open {
             display: block;
         }
+        .ad-mobile-sticky {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 50px;
+            margin: 0; border-top: 1px solid #444; z-index: 1000;
+            display: none; background: #000; width: 100%; justify-content: center; align-items: center;
+        }
+        @media (max-width: 768px) {
+            .ad-mobile-sticky { display: flex; }
+        }
     </style>
 </head>
 
@@ -340,6 +348,20 @@
             <label for="theme-switch" class="switch"></label>
         </div>
     </nav>
+
+    <!-- Top Leaderboard Ad -->
+    <div style="display:flex; justify-content:center; margin:15px 0; max-width:100%; overflow:hidden;">
+        <script>
+          atOptions = {
+            'key' : '7f80743993cfa8accd2c208f41f8a0b6',
+            'format' : 'iframe',
+            'height' : 90,
+            'width' : 728,
+            'params' : {}
+          };
+        </script>
+        <script src="https://www.highrevenueformat.com/7f80743993cfa8accd2c208f41f8a0b6/invoke.js"></script>
+    </div>
 
     <!-- Main Hero Section (Dark Charcoal) -->
     <section class="hero-section">
@@ -605,6 +627,20 @@
         }
     </script>
     <script src="common.js"></script>
+    
+    <!-- Sticky Mobile Footer Ad -->
+    <div class="ad-mobile-sticky">
+        <script>
+          atOptions = {
+            'key' : '2636eb05bf0294121b2c2ef4f44879ec',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
+        </script>
+        <script src="https://www.highrevenueformat.com/2636eb05bf0294121b2c2ef4f44879ec/invoke.js"></script>
+    </div>
 </body>
 
 </html>
