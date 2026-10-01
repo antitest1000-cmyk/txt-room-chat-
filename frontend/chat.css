@@ -678,48 +678,80 @@ ul {
 
     /* Top bar tweaks */
     .top-bar {
-        padding: 0 8px;
+        padding: 0 5px;
     }
 
     .top-bar-right {
-        gap: 8px;
-        padding-right: 8px;
-    }
-
-    .btn-leave {
-        padding: 5px 10px;
-        font-size: 12px;
+        gap: 6px;
+        padding-right: 5px;
     }
 
     .btn-rooms {
         font-size: 0;
-        padding: 0 10px;
+        padding: 0;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
     }
-
     .btn-rooms i {
-        font-size: 16px;
+        font-size: 18px;
     }
 
     .room-tab {
-        padding: 8px 10px;
+        padding: 0 10px;
+        height: 34px;
+        display: flex;
+        align-items: center;
         font-size: 13px;
         white-space: nowrap;
         max-width: 90px;
         overflow: hidden;
         text-overflow: ellipsis;
+        border-radius: 6px 6px 0 0;
     }
 
-    .user-menu-btn {
-        white-space: nowrap;
+    #btn-users-mobile {
+        font-size: 0 !important;
+        padding: 0 !important;
+        width: 34px;
+        height: 34px;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px !important;
+        margin-right: 0 !important;
     }
-    
+    #btn-users-mobile::before {
+        content: "👥";
+        font-size: 16px;
+    }
+
     .btn-leave {
         font-size: 0;
-        padding: 5px 8px;
+        padding: 0;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        border: 1px solid #444;
     }
     .btn-leave a::before {
         content: "🚪";
         font-size: 16px;
+    }
+
+    .user-menu-btn {
+        height: 34px;
+        padding: 0 8px;
+        background: #2a2a2a;
+        border-radius: 6px;
+        border: 1px solid #444;
+        white-space: nowrap;
     }
 
     /* Composer – stack emoji/actions above input on very small screens */
