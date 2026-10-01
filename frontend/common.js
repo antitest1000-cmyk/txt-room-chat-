@@ -27,6 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!localStorage.getItem('cookiesAccepted')) {
             setTimeout(() => {
                 cookieBanner.classList.add('show');
+                
+                // Auto-hide after 3 seconds on mobile
+                if (window.innerWidth <= 768) {
+                    setTimeout(() => {
+                        cookieBanner.classList.remove('show');
+                        localStorage.setItem('cookiesAccepted', 'true');
+                    }, 3000);
+                }
             }, 1000);
         }
 
