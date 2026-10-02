@@ -297,7 +297,7 @@
             botsList.innerHTML += `
                 <div class="bot-card ${bot.gender}">
                     <div class="bot-header">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${bot.username}" class="bot-avatar">
+                        <img src="https://avatar.iran.liara.run/public/${bot.gender === 'Female' ? 'girl' : 'boy'}?username=${encodeURIComponent(bot.username)}" class="bot-avatar">
                         <div class="bot-info">
                             <h4 class="bot-name">${bot.username}</h4>
                             <p class="bot-gender">${bot.gender === 'female' ? '♀ Female' : '♂ Male'}</p>
