@@ -14,4 +14,4 @@ Disallow: /chat
 Disallow: /server/
 
 # Sitemap location
-Sitemap: https://txtroom.netlify.app/sitemap.xml
+Sitemap: https://txt-room-chat.antitest1000.workers.dev/sitemap.xml
