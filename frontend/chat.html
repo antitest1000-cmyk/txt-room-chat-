@@ -844,7 +844,7 @@
                 <div class="op-bar">
                     <span class="op-badge">🎭 Operator</span>
                     <div class="op-avatar-wrap">
-                        <img id="opCurrentAvatar" src="https://randomuser.me/api/portraits/women/44.jpg"
+                        <img id="opCurrentAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=operator"
                             alt="persona">
                         <span class="op-online-dot"></span>
                     </div>
@@ -1240,7 +1240,7 @@
                 : (isAdmin ? '<span class="mod-delete" style="cursor:pointer;color:#ff4444;font-size:11px;margin-left:8px;" onclick="deleteOwnMsg(\'' + msgUid + '\')">&#x2715; del</span>' : '');
 
             const html = '<div class="message-group" data-user="' + msg.username + '" id="' + msgUid + '">'
-                + '<img src="' + getMsgAvatar(msg.username) + '" class="avatar ' + botClass + '" alt="avatar" onclick="openUserModal(\'' + msg.username + '\',\'' + (isGuest_ ? 'Guest' : 'Member') + '\')">'
+                + '<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(msg.username) + '" class="avatar ' + botClass + '" alt="avatar" onclick="openUserModal(\'' + msg.username + '\',\'' + (isGuest_ ? 'Guest' : 'Member') + '\')">'
                 + '<div class="message-content">'
                 + '<span class="username ' + color + '" style="cursor:pointer;" onclick="openUserModal(\'' + msg.username + '\',\'' + (isGuest_ ? 'Guest' : 'Member') + '\')">' + msg.username + ':</span> '
                 + displayMsg
@@ -1338,7 +1338,7 @@
                 card.className = 'op-persona-card';
                 card.dataset.id = p.id;
                 card.innerHTML = `
-                    <img src="https://randomuser.me/api/portraits/${p.gender === 'Female' ? 'girl' : 'boy' === 'girl' ? 'women' : 'men'}/${(String(p.username).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg" alt="">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.username)}" alt="">
                     <div>
                         <div class="op-card-name">${p.username}</div>
                         <div class="op-card-room">${p.room_slug}</div>
@@ -1392,13 +1392,13 @@
                         const avatar = document.getElementById('opCurrentAvatar');
                         if (p) {
                             disclosure.style.display = 'inline-block';
-                            avatar.src = `https://randomuser.me/api/portraits/${p.gender === 'Female' ? 'girl' : 'boy' === 'girl' ? 'women' : 'men'}/${(String(p.username).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg`;
+                            avatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.username)}`;
                             document.querySelectorAll('.op-persona-card').forEach(c => {
                                 c.classList.toggle('selected', parseInt(c.dataset.id) === pid);
                             });
                         } else {
                             disclosure.style.display = 'none';
-                            avatar.src = `https://randomuser.me/api/portraits/men/${(String(rawUsername).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg`;
+                            avatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(rawUsername)}`;
                             document.querySelectorAll('.op-persona-card').forEach(c => c.classList.remove('selected'));
                         }
                     });
@@ -1536,7 +1536,7 @@
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <div class="user-info" onclick="${isSelf ? '' : `openUserModal('${u.username}','${u.gender || (isG ? 'Guest' : 'Member')}')`}" style="${isSelf ? '' : 'cursor:pointer;'}">
-                        <img src="https://randomuser.me/api/portraits/${u.gender === 'Female' ? 'girl' : 'boy' === 'girl' ? 'women' : 'men'}/${(String(u.username).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg" class="list-avatar ${botClass}" alt="avatar">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.username)}" class="list-avatar ${botClass}" alt="avatar">
                         <span class="user-name">
                             ${u.username}
                             ${isAdm ? '<span class="mod-badge">MOD</span>' : ''}
@@ -1580,7 +1580,7 @@
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <div class="user-info" onclick="openUserModal('${name}','Friend')" style="cursor:pointer;">
-                        <img src="https://randomuser.me/api/portraits/women/${(String(name).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg" class="list-avatar">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}" class="list-avatar">
                         <span class="user-name">${name}</span>
                     </div>
                     <div class="user-actions">
@@ -1603,7 +1603,7 @@
             selectedUser = { username, gender };
             document.getElementById('modUsername').textContent = username;
             document.getElementById('modGender').textContent = gender || '';
-            document.getElementById('modAvatar').src = `https://randomuser.me/api/portraits/men/${(String(username).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg`;
+            document.getElementById('modAvatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}`;
             document.getElementById('modAdminSection').style.display = isAdmin ? 'block' : 'none';
 
             const isFriend = friendsList.includes(username);
