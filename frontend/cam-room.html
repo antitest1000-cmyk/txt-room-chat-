@@ -140,18 +140,21 @@
             .disc-left { border-right: none; border-bottom: 1px solid #2a2a2a; padding: 20px 16px; max-height: none; overflow-y: visible; }
             .disc-right { width: 100%; padding: 20px 16px; }
             .cam-layout { flex-direction: column; }
-            .cam-chat-panel { width: 100%; min-height: 200px; flex: 0.5; border-left: none; border-top: 1px solid #2a2a2a; display: flex; }
+            .cam-chat-panel { width: 100%; height: 350px; flex: none; border-left: none; border-top: 1px solid #2a2a2a; display: flex; }
             .cam-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 480px) {
-            .cam-controls { flex-wrap: wrap; gap: 8px; }
-            .ctrl-btn { padding: 8px 12px; font-size: 18px; }
+            .cam-controls { flex-wrap: nowrap; gap: 6px; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
+            .cam-controls::-webkit-scrollbar { display: none; }
+            .ctrl-btn { padding: 6px 10px; font-size: 16px; min-width: 65px; flex-shrink: 0; }
+            .ctrl-btn label { font-size: 9px; margin-top: 2px; }
             .cam-grid { grid-template-columns: 1fr 1fr; gap: 4px; }
             .cam-tile { min-height: 110px; }
             .warning-block { font-size: 12px; padding: 10px 12px; }
             .disc-checks label { font-size: 12px; }
             .cam-topbar { padding: 0 8px; }
             .cam-topbar .room-tag, .cam-topbar .username-tag { display: none; }
+            #topAdContainer { display: none !important; }
         }
         /* Ad Placeholders */
         .ad-placeholder {

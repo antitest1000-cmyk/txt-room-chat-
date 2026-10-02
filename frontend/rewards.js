@@ -59,7 +59,7 @@ function showRewardNotification(ms) {
     const notif = document.createElement('div');
     notif.style.cssText = `
         position: fixed;
-        bottom: 20px;
+        top: 70px;
         right: 20px;
         background: #222;
         border: 2px solid ${ms.color};
@@ -71,7 +71,7 @@ function showRewardNotification(ms) {
         align-items: center;
         gap: 15px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px ${ms.color}40;
-        transform: translateY(100px);
+        transform: translateY(-100px);
         opacity: 0;
         transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     `;
@@ -93,7 +93,7 @@ function showRewardNotification(ms) {
 
     // Animate out
     setTimeout(() => {
-        notif.style.transform = 'translateY(100px)';
+        notif.style.transform = 'translateY(-100px)';
         notif.style.opacity = '0';
         setTimeout(() => notif.remove(), 500);
     }, 6000);
