@@ -154,8 +154,9 @@
             .disc-checks label { font-size: 12px; }
             .cam-topbar { padding: 0 8px; }
             .cam-topbar .room-tag, .cam-topbar .username-tag { display: none; }
-            #topAdContainer { display: none !important; }
         }
+        .ad-desktop-only { display: block; }
+        .ad-mobile-only { display: none; }
         /* Ad Placeholders */
         .ad-placeholder {
             background: #222; border: 1px dashed #555; color: #777;
@@ -175,6 +176,8 @@
         @media (max-width: 768px) {
             .ad-leaderboard { height: 50px; max-width: 320px; }
             .ad-mobile-sticky { display: flex; }
+            .ad-desktop-only { display: none !important; }
+            .ad-mobile-only { display: flex !important; justify-content: center; width: 100%; }
             .cam-layout { padding-bottom: calc(75px + env(safe-area-inset-bottom)); }
         }
     </style>
@@ -276,17 +279,31 @@
             <a class="btn-leave-cam" href="/" onclick="stopCam()">Leave</a>
         </div>
     </div>
-    <div id="topAdContainer" style="display:flex; justify-content:center; margin:10px 0; max-width:100%; overflow:hidden;">
-        <script>
-          atOptions = {
-            'key' : '7f80743993cfa8accd2c208f41f8a0b6',
-            'format' : 'iframe',
-            'height' : 90,
-            'width' : 728,
-            'params' : {}
-          };
-        </script>
-        <script src="https://www.highrevenueformat.com/7f80743993cfa8accd2c208f41f8a0b6/invoke.js"></script>
+    <div id="topAdContainer" style="display:flex; flex-direction:column; align-items:center; margin:10px 0; width:100%;">
+        <div class="ad-desktop-only">
+            <script>
+              atOptions = {
+                'key' : '7f80743993cfa8accd2c208f41f8a0b6',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+              };
+            </script>
+            <script src="https://www.highrevenueformat.com/7f80743993cfa8accd2c208f41f8a0b6/invoke.js"></script>
+        </div>
+        <div class="ad-mobile-only">
+            <script>
+              atOptions = {
+                'key' : '2636eb05bf0294121b2c2ef4f44879ec',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+              };
+            </script>
+            <script src="https://www.highrevenueformat.com/2636eb05bf0294121b2c2ef4f44879ec/invoke.js"></script>
+        </div>
     </div>
 
     <div class="cam-layout">
