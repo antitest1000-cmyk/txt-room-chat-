@@ -68,7 +68,7 @@ function loadUsers() {
             const roleColor = user.role === 'OWNER' ? '#e8760a' : user.role === 'PERSONA_OPERATOR' ? '#4a90e2' : '#4caf50';
             li.innerHTML = `
                 <div class="details" style="display:flex; align-items:center; gap:12px;">
-                    <img src="https://avatar.iran.liara.run/public/${user.gender === 'Female' ? 'girl' : 'boy'}?username=${encodeURIComponent(user.username)}" style="width:38px;height:38px;border-radius:50%;background:#222;flex-shrink:0;">
+                    <img src="https://randomuser.me/api/portraits/${user.gender === 'Female' ? 'girl' : 'boy' === 'girl' ? 'women' : 'men'}/${(String(user.username).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg" style="width:38px;height:38px;border-radius:50%;background:#222;flex-shrink:0;">
                     <div>
                         <strong>${user.username}</strong>
                         <span style="color:${roleColor}; font-size:11px; font-weight:600;">${user.role}</span>
@@ -104,7 +104,7 @@ function loadUsers() {
             const lastSeen = g.last_seen ? new Date(g.last_seen).toLocaleDateString() : '—';
             return `
             <div style="background:#111; border:1px solid #222; border-radius:8px; padding:10px 12px; display:flex; align-items:center; gap:10px;">
-                <img src="https://avatar.iran.liara.run/public/boy?username=${encodeURIComponent(g.username)}" style="width:34px;height:34px;border-radius:50%;background:#1a1a1a;flex-shrink:0;">
+                <img src="https://randomuser.me/api/portraits/men/${(String(g.username).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg" style="width:34px;height:34px;border-radius:50%;background:#1a1a1a;flex-shrink:0;">
                 <div style="min-width:0; flex:1;">
                     <div style="font-weight:700; font-size:13px; color:#ccc; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.username}</div>
                     <div style="font-size:11px; color:#555; margin-top:2px;">
@@ -179,7 +179,7 @@ function loadAssignments() {
                         style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:8px; cursor:pointer; margin-bottom:6px; transition:all 0.2s;"
                         onmouseover="this.style.borderColor='#e8760a'; this.style.background='rgba(232,118,10,0.06)'"
                         onmouseout="if(document.getElementById('assignOperatorId').value!='${user.id}'){this.style.borderColor='#2a2a2a'; this.style.background='#1a1a1a';}">
-                        <img src="https://avatar.iran.liara.run/public/${user.gender === 'Female' ? 'girl' : 'boy'}?username=${encodeURIComponent(user.username)}"
+                        <img src="https://randomuser.me/api/portraits/${user.gender === 'Female' ? 'girl' : 'boy' === 'girl' ? 'women' : 'men'}/${(String(user.username).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg"
                             style="width:36px;height:36px;border-radius:50%;background:#222;flex-shrink:0;">
                         <div style="flex:1; min-width:0;">
                             <div style="font-weight:700; font-size:13px; color:#fff;">${user.username}</div>
@@ -464,7 +464,7 @@ function renderBotCards(bots) {
         return `
         <div style="background:#1a1a1a; border:1px solid #333; border-left:3px solid ${accentColor}; border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px;">
             <div style="display:flex; align-items:center; gap:10px;">
-                <img src="https://avatar.iran.liara.run/public/${bot.gender === 'Female' ? 'girl' : 'boy'}?username=${encodeURIComponent(bot.username)}" style="width:38px; height:38px; border-radius:50%; background:#222;">
+                <img src="https://randomuser.me/api/portraits/${bot.gender === 'Female' ? 'girl' : 'boy' === 'girl' ? 'women' : 'men'}/${(String(bot.username).split('').reduce((a,c)=>a+c.charCodeAt(0),0)) % 90 + 1}.jpg" style="width:38px; height:38px; border-radius:50%; background:#222;">
                 <div>
                     <div style="font-weight:700; font-size:14px;">${bot.username} <span style="color:${accentColor}; font-size:12px;">${genderIcon}</span></div>
                     <div style="font-size:11px; color:#666;">${bot.room_slug || currentBotRoom}</div>
