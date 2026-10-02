@@ -318,6 +318,8 @@ ul {
     line-height: 1.4;
     color: var(--text-main);
     width: 100%;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .username {
