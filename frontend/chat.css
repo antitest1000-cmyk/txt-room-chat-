@@ -681,6 +681,11 @@ ul {
         padding: 0 5px;
     }
 
+    .top-bar-left {
+        align-items: center;
+        gap: 6px;
+    }
+
     .top-bar-right {
         gap: 6px;
         padding-right: 5px;
@@ -695,9 +700,14 @@ ul {
         align-items: center;
         justify-content: center;
         border-radius: 6px;
+        border-right: none;
     }
     .btn-rooms i {
-        font-size: 18px;
+        font-size: 16px;
+    }
+
+    .room-tabs {
+        align-items: center;
     }
 
     .room-tab {
@@ -705,12 +715,17 @@ ul {
         height: 34px;
         display: flex;
         align-items: center;
+        justify-content: center;
         font-size: 13px;
         white-space: nowrap;
         max-width: 90px;
         overflow: hidden;
         text-overflow: ellipsis;
-        border-radius: 6px 6px 0 0;
+        border-radius: 6px;
+        border-top: none;
+    }
+    .room-tab.active {
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     }
 
     #btn-users-mobile {
@@ -740,6 +755,13 @@ ul {
         border-radius: 6px;
         border: 1px solid #444;
     }
+    .btn-leave a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
     .btn-leave a::before {
         content: "🚪";
         font-size: 16px;
@@ -752,6 +774,9 @@ ul {
         border-radius: 6px;
         border: 1px solid #444;
         white-space: nowrap;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     /* Composer – stack emoji/actions above input on very small screens */

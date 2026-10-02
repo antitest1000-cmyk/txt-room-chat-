@@ -7,7 +7,7 @@
     <meta name="description"
         content="Caught Me - Free Online Chat Rooms for Adults. Meet, connect, chat, and share with adults from around the world.">
     <title>Caught Me | Free Online Chat Rooms for Adults</title>
-    <meta name="google-site-verification" content="GAFtxEepvYnQvF145-T8hoBJyJY-FzdSeld5MOmTUk0" />
+    <meta name="google-site-verification" content="zfj3279xwPGfTYqn3RM0vjZRusYhT8THLKJrceS2E3Q" />
     <!-- Normal standard font -->
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -301,7 +301,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            min-height: 60px; height: auto;
+            min-height: 60px;
+            height: auto;
             margin: 0;
             border-top: 1px solid #444;
             z-index: 1000;
@@ -312,7 +313,10 @@
             align-items: center;
             padding: 5px 0 calc(5px + env(safe-area-inset-bottom)) 0;
         }
-        body { padding-bottom: 60px; }
+
+        body {
+            padding-bottom: 60px;
+        }
     </style>
 </head>
 
@@ -407,8 +411,11 @@
     <nav class="top-bar" style="display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; align-items:center; gap:15px;">
             <button class="menu-btn" id="hamburgerBtn">☰</button>
-            <div id="indexRewardsBtn" style="display:none; cursor:pointer; background:#222; padding:5px 12px; border-radius:20px; color:#e8760a; font-weight:bold; align-items:center; gap:8px; border:1px solid #444;" onclick="showRewardsModal()">
-                <i class="fa-solid fa-trophy"></i> <span id="indexTimerDisplay" style="font-variant-numeric:tabular-nums; color:#fff; font-size:14px;">0s</span>
+            <div id="indexRewardsBtn"
+                style="display:none; cursor:pointer; background:#222; padding:5px 12px; border-radius:20px; color:#e8760a; font-weight:bold; align-items:center; gap:8px; border:1px solid #444;"
+                onclick="showRewardsModal()">
+                <i class="fa-solid fa-trophy"></i> <span id="indexTimerDisplay"
+                    style="font-variant-numeric:tabular-nums; color:#fff; font-size:14px;">0s</span>
             </div>
         </div>
         <div class="toggle-switch">
