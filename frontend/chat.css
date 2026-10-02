@@ -694,7 +694,6 @@ ul {
     }
 
     .btn-rooms {
-        font-size: 0;
         padding: 0;
         width: 34px;
         height: 34px;
@@ -704,8 +703,12 @@ ul {
         border-radius: 6px;
         border-right: none;
     }
+    .btn-rooms span {
+        display: none;
+    }
     .btn-rooms i {
         font-size: 16px;
+        margin: 0;
     }
 
     .room-tabs {
