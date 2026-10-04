@@ -587,7 +587,37 @@ io.on('connection', (socket) => {
         });
     });
 
+
+    socket.on('send_friend_request', (data) => {
+        const { targetUsername } = data;
+        const senderUsername = socket._username;
+        const room = socket._room;
+        if (roomUsers[room]) {
+            for (const [sId, user] of roomUsers[room].entries()) {
+                if (user.username === targetUsername) {
+                    io.to(sId).emit('friend_request_received', { from: senderUsername });
+                    break;
+                }
+            }
+        }
+    });
+
+    socket.on('accept_friend_request', (data) => {
+        const { targetUsername } = data;
+        const accepterUsername = socket._username;
+        const room = socket._room;
+        if (roomUsers[room]) {
+            for (const [sId, user] of roomUsers[room].entries()) {
+                if (user.username === targetUsername) {
+                    io.to(sId).emit('friend_request_accepted', { from: accepterUsername });
+                    break;
+                }
+            }
+        }
+    });
+
     socket.on('disconnect', () => {
+
         console.log('User disconnected:', socket.id);
         const room = socket._room;
         if (room && roomUsers[room]) {
