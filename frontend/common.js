@@ -117,6 +117,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.removeItem('cm_isGuest');
                 window.location.reload();
             });
+
+            // Auto-redirect room links if logged in
+            document.querySelectorAll('a[href^="/"]').forEach(link => {
+                const href = link.getAttribute('href');
+                
+                // If it's a room link (e.g., /lounge, /sex-chat)
+                const isRoomLink = !['/', '/rooms', '/blog', '/cam-chat', '/safety', '/rules', '/contact', '/faq', '/banned', '/moderate', '/terms', '/dmca', '/privacy', '/2257', '/login', '/register'].includes(href);
+                
+                if (isRoomLink && href !== '#' && !href.startsWith('/login')) {
+                    const roomName = href.substring(1);
+                    const isGuestUser = localStorage.getItem('cm_isGuest') === 'true';
+                    const storedGender = localStorage.getItem('cm_gender') || '';
+                    
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        window.location.href = 'chat.html?room=' + encodeURIComponent(roomName) + '&username=' + encodeURIComponent(username) + '&guest=' + isGuestUser + (storedGender ? '&gender=' + encodeURIComponent(storedGender) : '');
+                    });
+                }
+            });
+
+            // Specific fix for "Join Chat Now" buttons that point to /login?room=...
+            document.querySelectorAll('a[href^="/login?room="]').forEach(joinBtn => {
+                joinBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const roomName = new URLSearchParams(joinBtn.getAttribute('href').split('?')[1]).get('room') || 'general';
+                    const isGuestUser = localStorage.getItem('cm_isGuest') === 'true';
+                    const storedGender = localStorage.getItem('cm_gender') || '';
+                    window.location.href = (roomName === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(roomName) + '&username=' + encodeURIComponent(username) + '&guest=' + isGuestUser + (storedGender ? '&gender=' + encodeURIComponent(storedGender) : '');
+                });
+            });
+
         } else {
             authDiv.innerHTML = `
                 <a href="login.html" style="text-decoration:none; font-size:14px; font-weight:bold; padding:4px 12px; border:1px solid currentColor; color:inherit; border-radius:4px;">Login</a>

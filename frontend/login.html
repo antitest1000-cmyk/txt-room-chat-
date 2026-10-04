@@ -253,7 +253,8 @@
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('cm_token');
 
         if (isLoggedIn && storedUser) {
-            window.location.href = (room === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(room) + '&username=' + encodeURIComponent(storedUser) + '&guest=' + isGuestUser;
+            const storedGender = localStorage.getItem('cm_gender') || '';
+            window.location.href = (room === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(room) + '&username=' + encodeURIComponent(storedUser) + '&guest=' + isGuestUser + (storedGender ? '&gender=' + encodeURIComponent(storedGender) : '');
         }
 
         // Update UI
