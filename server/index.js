@@ -488,32 +488,39 @@ io.on('connection', (socket) => {
                     if (roomUsers[room]) {
                         let targetSocketId = null;
                         for (const [sId, user] of roomUsers[room].entries()) {
-                            if (user.username === targetUsername) {
+                            // Case-insensitive match for whisper target
+                            if (user.username.toLowerCase() === targetUsername.toLowerCase()) {
                                 targetSocketId = sId;
                                 break;
                             }
                         }
                         
-                        if (targetSocketId) {
-                            const msg = {
-                                id: Date.now(),
-                                room_slug: room,
-                                username: displayUsername,
-                                content: `(Whisper) ${whisperContent}`,
-                                mediaUrl: mediaUrl,
-                                timestamp: new Date().toISOString(),
-                                isWhisper: true
-                            };
-                            socket.emit('new_message', msg);
-                            if (targetSocketId !== socket.id) {
-                                io.to(targetSocketId).emit('new_message', msg);
-                            }
-                            if (callback) callback({ success: true, message: msg });
-                            return; // Do not save or broadcast
+                        const msg = {
+                            id: Date.now(),
+                            room_slug: room,
+                            username: displayUsername,
+                            content: `(Whisper to ${targetUsername}) ${whisperContent}`,
+                            mediaUrl: mediaUrl,
+                            timestamp: new Date().toISOString(),
+                            isWhisper: true
+                        };
+                        
+                        // Always show the whisper to the sender
+                        socket.emit('new_message', msg);
+                        
+                        if (targetSocketId && targetSocketId !== socket.id) {
+                            io.to(targetSocketId).emit('new_message', msg);
                         } else {
-                            if (callback) callback({ error: 'User not found in room' });
-                            return;
+                            // Target not found in sockets. Might be a bot! Forward to BotEngine.
+                            // We construct a fake message object that looks like it's addressing the bot.
+                            botEngine.onNewMessage(room, {
+                                username: displayUsername,
+                                content: `(Whisper) ${whisperContent}`
+                            });
                         }
+                        
+                        if (callback) callback({ success: true, message: msg });
+                        return; // Do not save or broadcast globally
                     }
                 }
             }
