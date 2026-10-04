@@ -413,7 +413,7 @@ io.on('connection', (socket) => {
         socket._room = room;
         socket._username = username;
         if (!roomUsers[room]) roomUsers[room] = new Map();
-        roomUsers[room].set(socket.id, { username, gender: gender || (isGuest ? 'Guest' : 'Member') });
+        roomUsers[room].set(socket.id, { username, gender: gender || (isGuest ? 'Guest' : 'Member'), ip: ipAddress });
         // Broadcast updated user list to everyone in the room
         io.to(room).emit('user_list', Array.from(roomUsers[room].values()));
         console.log(`[JOIN] ${username} joined room: ${room} (IP: ${ipAddress})`);
@@ -480,6 +480,37 @@ io.on('connection', (socket) => {
             
             // Handle Whisper
             let textLower = (content || '').trim();
+            
+            // Check for /ip command (Admin only)
+            if (textLower.startsWith('/ip ') && token) {
+                try {
+                    const decoded = jwt.verify(token, JWT_SECRET);
+                    if (decoded.role === 'OWNER' || decoded.role === 'MODERATOR') {
+                        const targetUser = content.substring(4).trim();
+                        let foundIp = null;
+                        if (roomUsers[room]) {
+                            for (const [sId, user] of roomUsers[room].entries()) {
+                                if (user.username.toLowerCase() === targetUser.toLowerCase()) {
+                                    foundIp = user.ip || 'Unknown';
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        const msg = {
+                            id: Date.now(),
+                            room_slug: room,
+                            username: '🛡️ SYSTEM',
+                            content: foundIp ? `IP for ${targetUser} is ${foundIp}` : `User ${targetUser} not found.`,
+                            timestamp: new Date().toISOString()
+                        };
+                        socket.emit('new_message', msg);
+                        if (callback) callback({ success: true });
+                        return; // Stop processing
+                    }
+                } catch (e) {} // ignore if not valid admin
+            }
+
             if (textLower.startsWith('/w ')) {
                 const match = content.match(/^\/w\s+([^\s]+)\s+(.*)$/i);
                 if (match) {
