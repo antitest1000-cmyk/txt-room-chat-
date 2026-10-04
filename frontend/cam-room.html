@@ -96,6 +96,7 @@
         .cam-chat-panel .panel-title {
             padding: 10px 14px; font-size: 13px; font-weight: 700;
             border-bottom: 1px solid #2a2a2a; color: #e8760a; background: #1a1a1a;
+            display: flex; justify-content: space-between; align-items: center;
         }
         .cam-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
         .cam-msg { font-size: 12px; line-height: 1.4; word-break: break-word; }
@@ -134,14 +135,49 @@
         .disc-enter-btn.ready { opacity: 1; pointer-events: all; }
         .disc-leave-link { display: block; text-align: center; margin-top: 12px; color: #555; font-size: 12px; text-decoration: underline; cursor: pointer; }
 
+        .mobile-chat-fab { display: none; }
+        .mobile-close-chat { display: none; }
+        
         /* Mobile — stack vertically */
         @media (max-width: 768px) {
             .disclaimer-box { flex-direction: column; max-width: 500px; max-height: 90vh; overflow-y: auto; }
             .disc-left { border-right: none; border-bottom: 1px solid #2a2a2a; padding: 20px 16px; max-height: none; overflow-y: visible; }
             .disc-right { width: 100%; padding: 20px 16px; }
-            .cam-layout { flex-direction: column; }
-            .cam-chat-panel { width: 100%; height: 350px; flex: none; border-left: none; border-top: 1px solid #2a2a2a; display: flex; }
+            .cam-layout { flex-direction: column; position: relative; }
+            .cam-chat-panel { 
+                width: 100%; 
+                height: 60vh; 
+                flex: none; 
+                border-left: none; 
+                border-top: 2px solid #e8760a; 
+                display: none; 
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                z-index: 100;
+                box-shadow: 0 -5px 15px rgba(0,0,0,0.8);
+            }
+            .cam-chat-panel.show { display: flex; }
             .cam-grid { grid-template-columns: 1fr 1fr; }
+            .mobile-chat-fab {
+                display: flex;
+                position: fixed;
+                bottom: calc(85px + env(safe-area-inset-bottom));
+                right: 16px;
+                background: #e8760a;
+                color: #fff;
+                border: none;
+                border-radius: 50px;
+                padding: 14px 20px;
+                font-size: 15px;
+                font-weight: bold;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+                z-index: 99;
+                cursor: pointer;
+                align-items: center;
+                gap: 8px;
+            }
+            .mobile-close-chat { display: block; }
         }
         @media (max-width: 480px) {
             .cam-controls { flex-wrap: nowrap; gap: 6px; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
@@ -347,8 +383,11 @@
         </div>
 
         <!-- Side Chat -->
-        <div class="cam-chat-panel">
-            <div class="panel-title"><i class="fa-solid fa-comments"></i> Room Chat</div>
+        <div class="cam-chat-panel" id="camChatPanel">
+            <div class="panel-title">
+                <span><i class="fa-solid fa-comments"></i> Room Chat</span>
+                <span class="mobile-close-chat" onclick="toggleMobileChat()" style="cursor:pointer; font-size: 16px; color:#aaa; padding:0 8px;">✕</span>
+            </div>
             <div class="cam-messages" id="camMessages">
                 <div class="cam-msg system-msg">Welcome to Live Cam Chat! Be respectful.</div>
                 <div class="cam-msg system-msg" style="color:#c0392b;">⚠️ Recording other users without consent is prohibited.</div>
@@ -376,7 +415,20 @@
     </div>
 </div>
 
+<button class="mobile-chat-fab" id="mobileChatBtn" onclick="toggleMobileChat()">
+    <i class="fa-solid fa-comments"></i> Chat
+</button>
+
 <script>
+    function toggleMobileChat() {
+        const panel = document.getElementById('camChatPanel');
+        panel.classList.toggle('show');
+        if (panel.classList.contains('show')) {
+            const msgs = document.getElementById('camMessages');
+            if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        }
+    }
+
     // ════════════════════════════════════════════════
     //  AUTH CHECK
     // ════════════════════════════════════════════════
