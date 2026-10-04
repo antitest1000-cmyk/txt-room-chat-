@@ -1241,11 +1241,12 @@
                 ? '<span class="own-delete-btn" title="Delete message" onclick="deleteOwnMsg(\'' + msgUid + '\', ' + (msg.id || null) + ')">&#128465;&#65039;</span>'
                 : (isAdmin ? '<span class="mod-delete" style="cursor:pointer;color:#ff4444;font-size:11px;margin-left:8px;" onclick="deleteOwnMsg(\'' + msgUid + '\', ' + (msg.id || null) + ')">&#x2715; del</span>' : '');
 
+            const whisperStyle = msg.isWhisper ? 'style="color: #00d2ff; font-style: italic;"' : '';
             const html = '<div class="message-group" data-user="' + msg.username + '" id="' + msgUid + '">'
                 + '<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(msg.username) + '" class="avatar ' + botClass + '" alt="avatar" onclick="openUserModal(\'' + msg.username + '\',\'' + (isGuest_ ? 'Guest' : 'Member') + '\')">'
                 + '<div class="message-content">'
                 + '<span class="username ' + color + '" style="cursor:pointer;" onclick="openUserModal(\'' + msg.username + '\',\'' + (isGuest_ ? 'Guest' : 'Member') + '\')">' + msg.username + ':</span> '
-                + displayMsg
+                + `<span ${whisperStyle}>${displayMsg}</span>`
                 + mediaHtml
                 + '<span class="timestamp">' + time + '</span>'
                 + deleteHtml

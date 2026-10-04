@@ -476,6 +476,48 @@ io.on('connection', (socket) => {
                     displayUsername = user.username;
                 } catch (e) {} // ignore, treat as guest if token invalid
             }
+            
+            // Handle Whisper
+            let textLower = (content || '').trim();
+            if (textLower.startsWith('/w ')) {
+                const match = content.match(/^\/w\s+([^\s]+)\s+(.*)$/i);
+                if (match) {
+                    const targetUsername = match[1];
+                    const whisperContent = match[2];
+                    
+                    if (roomUsers[room]) {
+                        let targetSocketId = null;
+                        for (const [sId, user] of roomUsers[room].entries()) {
+                            if (user.username === targetUsername) {
+                                targetSocketId = sId;
+                                break;
+                            }
+                        }
+                        
+                        if (targetSocketId) {
+                            const msg = {
+                                id: Date.now(),
+                                room_slug: room,
+                                username: displayUsername,
+                                content: `(Whisper) ${whisperContent}`,
+                                mediaUrl: mediaUrl,
+                                timestamp: new Date().toISOString(),
+                                isWhisper: true
+                            };
+                            socket.emit('new_message', msg);
+                            if (targetSocketId !== socket.id) {
+                                io.to(targetSocketId).emit('new_message', msg);
+                            }
+                            if (callback) callback({ success: true, message: msg });
+                            return; // Do not save or broadcast
+                        } else {
+                            if (callback) callback({ error: 'User not found in room' });
+                            return;
+                        }
+                    }
+                }
+            }
+            
             checkModerationAndBroadcast();
         }
 

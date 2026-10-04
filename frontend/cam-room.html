@@ -804,6 +804,7 @@
                 <div style="display:flex;flex-direction:column;gap:8px;">
                     <button onclick="startWhisper('${username}');document.getElementById('quickModal').remove();" style="background:#2a4a7a;color:#7ab3ff;border:none;border-radius:8px;padding:9px;cursor:pointer;font-size:13px;font-weight:600;text-align:left;"><i class="fa-solid fa-comments"></i> Whisper (Private Message)</button>
                     <button onclick="doIgnoreUser('${username}');document.getElementById('quickModal').remove();" style="background:#333;color:#ccc;border:none;border-radius:8px;padding:9px;cursor:pointer;font-size:13px;font-weight:600;text-align:left;">🚫 Ignore</button>
+                    <button onclick="doAddFriendUser('${username}');document.getElementById('quickModal').remove();" style="background:#333;color:#ccc;border:none;border-radius:8px;padding:9px;cursor:pointer;font-size:13px;font-weight:600;text-align:left;">➕ Add Friend</button>
                     <button onclick="doReportUser('${username}');document.getElementById('quickModal').remove();" style="background:#5a2a00;color:#ff9944;border:none;border-radius:8px;padding:9px;cursor:pointer;font-size:13px;font-weight:600;text-align:left;">⚠️ Report</button>
                 </div>
             </div>`;
@@ -815,7 +816,14 @@
         document.getElementById('camChatInput').value = `/w ${name} `;
         document.getElementById('camChatInput').focus();
     }
-    function doIgnoreUser(name) { addCamSystemMsg(`You are now ignoring ${name}.`); }
+    let ignoreList = JSON.parse(localStorage.getItem('ignoreList') || '[]');
+    function doIgnoreUser(name) { 
+        if (!ignoreList.includes(name)) {
+            ignoreList.push(name);
+            localStorage.setItem('ignoreList', JSON.stringify(ignoreList));
+        }
+        addCamSystemMsg(`You are now ignoring ${name}.`);
+    }
     function doReportUser(name) {
         fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
             body: JSON.stringify({ action:'report', reporter: displayUsername, reported: name, room:'cam-room' }) });
