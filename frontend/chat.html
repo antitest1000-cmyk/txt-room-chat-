@@ -663,17 +663,23 @@
         .ad-leaderboard { width: 100%; max-width: 728px; height: 90px; }
         .ad-mrec { width: 300px; height: 250px; max-width: 100%; }
         .ad-mobile-sticky {
-            display: none;
+            display: flex;
+            order: 10; /* Bottom for PC */
             min-height: 60px; height: auto;
-            margin: 0; border-bottom: 1px solid #444; z-index: 1000;
+            margin: 0; border-top: 1px solid #444; border-bottom: none; z-index: 1000;
             justify-content: center; align-items: center; background: #000; width: 100%;
-            padding: calc(5px + env(safe-area-inset-top)) 0 5px 0;
+            padding: 5px 0 calc(5px + env(safe-area-inset-bottom)) 0;
             flex-shrink: 0;
         }
 
         @media (max-width: 768px) {
             .ad-leaderboard { height: 50px; max-width: 320px; }
-            .ad-mobile-sticky { display: flex; }
+            .ad-mobile-sticky { 
+                order: -1; /* Top for mobile */
+                border-top: none;
+                border-bottom: 1px solid #444;
+                padding: calc(5px + env(safe-area-inset-top)) 0 5px 0;
+            }
         }
     </style>
 
