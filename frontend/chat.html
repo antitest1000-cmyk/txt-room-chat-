@@ -663,16 +663,17 @@
         .ad-leaderboard { width: 100%; max-width: 728px; height: 90px; }
         .ad-mrec { width: 300px; height: 250px; max-width: 100%; }
         .ad-mobile-sticky {
-            position: fixed; bottom: 0; left: 0; right: 0; min-height: 60px; height: auto;
-            margin: 0; border-top: 1px solid #444; z-index: 1000;
-            display: flex; justify-content: center; align-items: center; background: #000; width: 100%;
-            padding: 5px 0 calc(5px + env(safe-area-inset-bottom)) 0;
+            display: none;
+            min-height: 60px; height: auto;
+            margin: 0; border-bottom: 1px solid #444; z-index: 1000;
+            justify-content: center; align-items: center; background: #000; width: 100%;
+            padding: calc(5px + env(safe-area-inset-top)) 0 5px 0;
+            flex-shrink: 0;
         }
 
         @media (max-width: 768px) {
             .ad-leaderboard { height: 50px; max-width: 320px; }
             .ad-mobile-sticky { display: flex; }
-            .chat-layout { padding-bottom: calc(75px + env(safe-area-inset-bottom)); }
         }
     </style>
 
@@ -687,6 +688,20 @@
             We use cookies to enhance your browsing experience. By clicking "Accept", you consent to our use of cookies.
         </div>
         <button class="cookie-btn" id="acceptCookiesBtn">Accept</button>
+    </div>
+
+    <!-- Mobile Top Ad -->
+    <div class="ad-mobile-sticky" style="justify-content:center; align-items:center; background:#000;">
+        <script>
+          atOptions = {
+            'key' : '2636eb05bf0294121b2c2ef4f44879ec',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
+        </script>
+        <script src="https://www.highrevenueformat.com/2636eb05bf0294121b2c2ef4f44879ec/invoke.js"></script>
     </div>
 
     <!-- Top Navigation Bar -->
@@ -2020,18 +2035,7 @@
         }
     </script>
     <script src="common.js"></script>
-<div class="ad-mobile-sticky" style="justify-content:center; align-items:center; background:#000;">
-    <script>
-      atOptions = {
-        'key' : '2636eb05bf0294121b2c2ef4f44879ec',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script src="https://www.highrevenueformat.com/2636eb05bf0294121b2c2ef4f44879ec/invoke.js"></script>
-</div>
+
 <script src="rewards.js"></script>
 </body>
 
