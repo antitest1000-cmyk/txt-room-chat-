@@ -1235,11 +1235,11 @@
             const color = isGuest_ ? 'user-pink' : 'user-blue';
             const botClass = getBotAvatarClass(msg.username);
             const isMine = msg.username === displayUsername;
-            const msgUid = 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+            const msgUid = msg.id ? 'msg-' + msg.id : 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
 
             const deleteHtml = isMine
-                ? '<span class="own-delete-btn" title="Delete message" onclick="deleteOwnMsg(\'' + msgUid + '\')">&#128465;&#65039;</span>'
-                : (isAdmin ? '<span class="mod-delete" style="cursor:pointer;color:#ff4444;font-size:11px;margin-left:8px;" onclick="deleteOwnMsg(\'' + msgUid + '\')">&#x2715; del</span>' : '');
+                ? '<span class="own-delete-btn" title="Delete message" onclick="deleteOwnMsg(\'' + msgUid + '\', ' + (msg.id || null) + ')">&#128465;&#65039;</span>'
+                : (isAdmin ? '<span class="mod-delete" style="cursor:pointer;color:#ff4444;font-size:11px;margin-left:8px;" onclick="deleteOwnMsg(\'' + msgUid + '\', ' + (msg.id || null) + ')">&#x2715; del</span>' : '');
 
             const html = '<div class="message-group" data-user="' + msg.username + '" id="' + msgUid + '">'
                 + '<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(msg.username) + '" class="avatar ' + botClass + '" alt="avatar" onclick="openUserModal(\'' + msg.username + '\',\'' + (isGuest_ ? 'Guest' : 'Member') + '\')">'
@@ -1256,12 +1256,15 @@
             if (nearBottom) msgsContainer.scrollTop = msgsContainer.scrollHeight;
         }
 
-        function deleteOwnMsg(msgUid) {
+        function deleteOwnMsg(msgUid, serverId) {
             const el = document.getElementById(msgUid);
             if (el) {
                 el.style.transition = 'opacity 0.25s';
                 el.style.opacity = '0';
                 setTimeout(() => el.remove(), 260);
+            }
+            if (serverId && socket) {
+                socket.emit('delete_message', { room, id: serverId, token: localStorage.getItem('cm_token') });
             }
         }
 
@@ -1284,6 +1287,15 @@
             socket.on('connect', () => {
                 console.log('[WS] Connected:', socket.id);
                 socket.emit('join_room', { room, username: displayUsername, isGuest });
+            });
+
+            socket.on('message_deleted', (deletedId) => {
+                const el = document.getElementById('msg-' + deletedId);
+                if (el) {
+                    el.style.transition = 'opacity 0.25s';
+                    el.style.opacity = '0';
+                    setTimeout(() => el.remove(), 260);
+                }
             });
 
             socket.on('new_message', (msg) => {

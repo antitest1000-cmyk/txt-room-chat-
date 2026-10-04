@@ -523,6 +523,28 @@ io.on('connection', (socket) => {
         }
     });
 
+
+    socket.on('delete_message', (data, callback) => {
+        const { room, id, token } = data;
+        let isAuthorized = false;
+        if (token) {
+            try {
+                const user = jwt.verify(token, JWT_SECRET);
+                if (user.role === 'OWNER' || user.role === 'MODERATOR') isAuthorized = true;
+            } catch(e){}
+        }
+        db.get('SELECT username FROM messages WHERE id = ?', [id], (err, row) => {
+            if (row && (isAuthorized || row.username === socket._username)) {
+                db.run('DELETE FROM messages WHERE id = ?', [id], () => {
+                    io.to(room).emit('message_deleted', id);
+                    if (callback) callback({success:true});
+                });
+            } else {
+                if (callback) callback({error:'Unauthorized'});
+            }
+        });
+    });
+
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
         const room = socket._room;
