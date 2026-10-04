@@ -158,6 +158,10 @@
                 alert("Passwords do not match!");
                 return;
             }
+            if (!gender) {
+                alert("Please select a gender.");
+                return;
+            }
             
             const btn = document.getElementById('registerBtn');
             btn.disabled = true;

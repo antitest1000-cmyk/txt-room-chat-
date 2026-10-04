@@ -292,6 +292,12 @@
                 const username = document.getElementById('usernameInput').value;
                 const gender = document.getElementById('genderInput').value;
                 const btn = document.getElementById('guestBtn');
+                
+                if (!gender) {
+                    alert('Please select a gender.');
+                    return;
+                }
+                
                 btn.textContent = 'Joining...';
                 btn.disabled = true;
 
@@ -304,7 +310,8 @@
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('cm_username', username);
                     localStorage.setItem('cm_isGuest', 'true');
-                    window.location.href = (room === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(room) + '&username=' + encodeURIComponent(username) + '&guest=true';
+                    localStorage.setItem('cm_gender', gender);
+                    window.location.href = (room === 'cam-room' ? 'cam-room.html' : 'chat.html') + '?room=' + encodeURIComponent(room) + '&username=' + encodeURIComponent(username) + '&guest=true&gender=' + encodeURIComponent(gender);
                 });
             } else {
                 const username = document.getElementById('memberUsernameInput').value;
