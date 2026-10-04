@@ -73,6 +73,15 @@
         }
         .btn-enter-cam:hover { background: #d4690a; }
         .btn-back { display: block; margin-top: 14px; color: #666; font-size: 13px; text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .cam-badge { order: 1; }
+            .cam-room-hero h1 { order: 2; margin-bottom: 12px; }
+            .cam-action-buttons { order: 3; margin-bottom: 24px; }
+            .cam-room-hero p { order: 4; }
+            .cam-features { order: 5; }
+            .cam-warning-strip { order: 6; }
+        }
     </style>
 
     <link rel="icon" type="image/png" href="/favicon.png">
@@ -184,8 +193,10 @@
                 arising from your voluntary participation in live cam sessions. Full warnings and terms will be displayed before you enter.
             </div>
 
-            <a class="btn-enter-cam" href="/login?room=cam-room">Enter Cam Room →</a>
-            <a class="btn-back" href="/">← Back to Chat Rooms</a>
+            <div class="cam-action-buttons">
+                <a class="btn-enter-cam" href="/login?room=cam-room">Enter Cam Room →</a>
+                <a class="btn-back" href="/">← Back to Chat Rooms</a>
+            </div>
         </div>
     </section>
 
