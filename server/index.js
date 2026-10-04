@@ -408,6 +408,7 @@ io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
     socket.on('join_room', ({ room, username, isGuest, gender }) => {
+        const ipAddress = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
         socket.join(room);
         socket._room = room;
         socket._username = username;
@@ -415,7 +416,7 @@ io.on('connection', (socket) => {
         roomUsers[room].set(socket.id, { username, gender: gender || (isGuest ? 'Guest' : 'Member') });
         // Broadcast updated user list to everyone in the room
         io.to(room).emit('user_list', Array.from(roomUsers[room].values()));
-        console.log(`${username} joined room: ${room}`);
+        console.log(`[JOIN] ${username} joined room: ${room} (IP: ${ipAddress})`);
     });
 
     // Admin panel live log subscription
