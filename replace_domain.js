@@ -6,8 +6,8 @@ const filesToUpdate = [
     'frontend/robots.txt'
 ];
 
-const oldDomain = 'https://txtroom.netlify.app';
-const newDomain = 'https://txt-room-chat.antitest1000.workers.dev';
+const oldDomain = 'https://txt-room-chat.antitest1000.workers.dev';
+const newDomain = 'https://caughtme.fun';
 
 filesToUpdate.forEach(f => {
     const fullPath = path.join(__dirname, f);
